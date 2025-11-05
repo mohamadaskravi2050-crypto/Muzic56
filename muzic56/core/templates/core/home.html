@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muzic56</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body { 
+    margin: 0; 
+    font-family: Arial, sans-serif; 
+    background-color: #fffaf5; 
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+header {
+    background-color: #ff7b00;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.logo { font-size: 24px; font-weight: bold; }
+.btn {
+    background-color: white;
+    color: #ff7b00;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+.btn:hover { 
+    background-color: #ffe0c2;
+    transform: translateY(-2px);
+}
+.profile-icon {
+    background-color: white;
+    color: #ff7b00;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.profile-icon:hover {
+    transform: scale(1.1);
+}
+.hidden { display: none !important; }
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+}
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+.modal-close:hover {
+    color: #ff7b00;
+}
+input, textarea { 
+    width: 90%; 
+    padding: 12px; 
+    margin: 10px 0; 
+    border-radius: 10px; 
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+button.submit-btn { 
+    background-color: #ff7b00; 
+    color: white; 
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 25px; 
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+button.submit-btn:hover { 
+    background-color: #ff9133;
+    transform: translateY(-2px);
+}
+.upload-section { 
+    margin: 30px 0; 
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* استایل برای نمایش مربعی موزیک ها */
+.music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.music-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+.music-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.music-cover {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: linear-gradient(45deg, #ff7b00, #ff9133);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+}
+.music-info {
+    padding: 15px;
+}
+.music-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+.music-artist {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+.music-uploader {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* دکمه لایک */
+.like-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.9);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.like-btn:hover {
+    transform: scale(1.2);
+}
+.like-btn.liked {
+    color: #ff4444;
+}
+
+/* دکمه اضافه کردن به پلی‌لیست */
+.add-to-playlist-btn {
+    background: none;
+    border: none;
+    color: #ff7b00;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.9);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.add-to-playlist-btn:hover {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* استایل منوی پلی‌لیست */
+.playlist-menu {
+    position: fixed;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    padding: 15px;
+    z-index: 1001;
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 200px;
+}
+.playlist-menu-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.playlist-menu-item:hover {
+    background: #f5f5f5;
+}
+
+/* نوتیفیکیشن */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    z-index: 1002;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+/* پلیر پایین صفحه */
+.bottom-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #ff7b00;
+    color: white;
+    padding: 15px 20px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+.player-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #ff9133, #ff7b00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+.player-details {
+    flex: 1;
+}
+.player-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+.player-artist {
+    font-size: 12px;
+    opacity: 0.9;
+}
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 2;
+    justify-content: center;
+}
+.player-controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+.player-controls button:hover {
+    background: rgba(255,255,255,0.2);
+}
+.progress-bar {
+    flex: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.progress-container {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+.progress {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s ease;
+}
+.time {
+    font-size: 12px;
+    min-width: 40px;
+}
+.close-player {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff7b00;
+    font-weight: bold;
+}
+
+/* پلیر توسعه یافته */
+.expanded-player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.expanded-player-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+}
+
+.expanded-cover {
+    width: 300px;
+    height: 300px;
+    border-radius: 15px;
+    margin: 0 auto 20px;
+    background: linear-gradient(45deg, #ff7b00, #ff9133);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 80px;
+}
+
+.expanded-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.expanded-artist {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.expanded-uploader {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.expanded-progress {
+    width: 100%;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin: 20px 0;
+    cursor: pointer;
+    position: relative;
+}
+
+.expanded-progress-bar {
+    height: 100%;
+    background: #ff7b00;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+.expanded-time {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.expanded-controls {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 25px 0;
+}
+
+.expanded-controls button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.expanded-controls button:hover {
+    background: #f5f5f5;
+}
+
+.expanded-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+/* پلیر مخفی برای نگهداری وضعیت پخش */
+.hidden-audio-player {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+}
+
+/* کاروسل موزیک‌ها */
+.music-carousel {
+    position: relative;
+    margin: 30px 0;
+    overflow: hidden;
+}
+
+.carousel-container {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: 20px;
+}
+
+.carousel-item {
+    flex: 0 0 calc(20% - 16px);
+    min-width: 0;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 123, 0, 0.8);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+    background: rgba(255, 123, 0, 1);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-prev {
+    left: 10px;
+}
+
+.carousel-next {
+    right: 10px;
+}
+
+/* بخش درباره ما */
+.about-section {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    margin: 50px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.about-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 32px;
+}
+
+.about-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    line-height: 1.8;
+}
+
+/* فوتر */
+footer {
+    background: #333;
+    color: white;
+    padding: 40px 0 20px;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.social-links {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.social-link {
+    color: white;
+    font-size: 24px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    color: #ff7b00;
+    transform: translateY(-3px);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #555;
+    width: 100%;
+    color: #aaa;
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+}
+
+
+
+/* استایل dropdown نتایج جستجو */
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-result-item:hover {
+    background: #f5f5f5;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    background: linear-gradient(45deg, #ff7b00, #ff9133);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    margin-left: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-title {
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #333;
+}
+
+.search-result-artist {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+/* استایل input جستجو در هدر */
+#header-search {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 2px solid #ff7b00;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#header-search:focus {
+    border-color: #ff9133;
+    box-shadow: 0 0 5px rgba(255, 123, 0, 0.3);
+}
+
+</style>
+</head>
+<body>
+
+<!-- در تگ <header>، بعد از دکمه‌ها و قبل از profile-circle این کد را اضافه کنید: -->
+
+    <header>
+        <div class="logo">Muzic56</div>
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; max-width: 400px; margin: 0 20px; justify-content: center;">
+            <!-- مسیر صحیح: /search (بدون .html) -->
+            <button id="search-btn" class="btn" onclick="window.location.href='/search/'">🔍 Search Muzic </button>
+        </div>
+       
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="about-btn" class="btn">About me</button>
+            <button id="upload-btn" class="btn">Upload Music</button>
+            <button id="auth-btn" class="btn">Register / Login</button>
+            <button id="playlists-btn" class="btn">My Playlists</button>
+            <div id="profile-circle" class="profile-icon hidden"></div>
+        </div>
+    </header>
+
+<main>
+    <h1 style="text-align:center; margin-bottom:10px;">Welcome to Muzic56 🎵</h1>
+    <p style="text-align:center; margin-bottom:30px; color:#666;">Upload, listen, and enjoy music freely.</p>
+
+    <!-- Upload Section -->
+    <div id="upload-section" class="upload-section hidden">
+        <h2>Upload Your Music</h2>
+        <input type="text" id="music-title" placeholder="Music Title *"><br>
+        <input type="text" id="music-artist" placeholder="Artist (optional)"><br>
+        <input type="file" id="music-file" accept="audio/*"><br>
+        <input type="file" id="music-cover" accept="image/*"><br>
+        <button class="submit-btn" onclick="uploadMusic()">Upload</button>
+        <button class="btn" onclick="hideUploadSection()" style="margin-left:10px;">Cancel</button>
+        <p id="upload-msg"></p>
+    </div>
+
+    <!-- Music Carousel -->
+    <div id="music-carousel-section">
+        <h2>Latest Music</h2>
+        <div class="music-carousel">
+            <button class="carousel-btn carousel-prev" onclick="prevSlide()">❮</button>
+            <div class="carousel-container" id="carousel-container">
+                <!-- موزیک‌ها اینجا نمایش داده می‌شوند -->
+            </div>
+            <button class="carousel-btn carousel-next" onclick="nextSlide()">❯</button>
+        </div>
+    </div>
+
+
+    <!-- بعد از بخش Music Carousel و قبل از Public Playlists این کد را اضافه کنید -->
+
+<!-- موتور جستجو -->
+
+<!-- موزیک‌های پرطرفدار -->
+<!-- موزیک‌های پرطرفدار -->
+<div id="popular-music-section" style="margin: 50px 0;">
+    <h2 style="text-align: center; margin-bottom: 30px;">🔥 پرطرفدارترین موزیک‌ها</h2>
+    
+    <div class="music-carousel">
+        <button class="carousel-btn carousel-prev" onclick="prevPopularSlide()">❮</button>
+        <div class="carousel-container" id="popular-carousel-container">
+            <!-- موزیک‌های پرطرفدار اینجا لود می‌شوند -->
+        </div>
+        <button class="carousel-btn carousel-next" onclick="nextPopularSlide()">❯</button>
+    </div>
+    
+    <div id="popular-music" class="music-grid" style="display: none;">
+        <!-- فول backup -->
+    </div>
+</div>
+
+    <!-- Public Playlists Section -->
+
+
+    <!-- About Us Section -->
+    <div id="about-section" class="about-section">
+        <h2>About me</h2>
+        <div class="about-content">
+            <p>My name is Mohammad56, a passionate back-end developer who loves programming and working in this field. I am 20 years old and a student-teacher currently studying in Ahvaz, majoring in Social Sciences. Although my university major is not related to the work I do, I am dedicated to building a strong portfolio through various projects.</p>
+            
+            <p>One of these projects is Muzic56, a website I built using Django. The name “Muzic” was intentionally spelled this way. I focused on developing the site with precision, speed, and high security. The back-end was entirely developed by me, while the front-end was handled with the help of artificial intelligence.</p>
+            
+            <p>I have the ability to harness the full power of different AI tools, especially when it comes to analyzing data and reviewing code. I am a Python developer working with the Django framework. I also have experience with PHP and am skilled in back-end development overall.</p>
+            
+            <p>One of my key strengths is utilizing artificial intelligence to its fullest potential, especially in generating powerful scripts. This website was built in less than 8 days. I had to limit some features to avoid overloading the site, but all the essential functionalities were included.</p>
+            
+            <p>The idea was also to include a public playlists system, but it was not implemented due to size constraints, although the function for it exists in the code. I built this site entirely on my own. It allows users to listen to music, upload tracks, create playlists, register accounts, and more.</p>
+            
+            <p>I hope you enjoy reviewing this project. If you notice that JavaScript, CSS, and HTML are mixed together, it's because I used AI to assist with development — though I may separate them later for better structure. :)</p>
+        </div>
+        
+        </div>
+    </div>
+</main>
+
+<!-- Auth Modal -->
+<div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeAuthModal()">✕</button>
+        <h2 id="modal-title">Register</h2>
+        <input type="text" id="modal-username" placeholder="Username"><br>
+        <input type="password" id="modal-password" placeholder="Password"><br>
+        <button class="submit-btn" id="submit-btn">Submit</button>
+        <p id="msg" style="color:red;"></p>
+        <p id="toggle-text" style="cursor:pointer; color:#ff7b00;">Already have an account? Login</p>
+    </div>
+</div>
+
+<!-- Upload Prompt Modal -->
+<div id="upload-prompt-modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="modal-close" onclick="hideUploadPromptModal()">✕</button>
+        <h2>Upload Music</h2>
+        <p>Please login or register to upload music.</p>
+        <button class="submit-btn" onclick="showAuthModal()">Login / Register</button>
+        <button class="btn" onclick="hideUploadPromptModal()" style="margin-top:10px;">Cancel</button>
+    </div>
+</div>
+
+<!-- Bottom Music Player -->
+<div id="bottom-player" class="bottom-player">
+    <button class="close-player" onclick="closePlayer()">✕</button>
+    <div class="player-info">
+        <div class="player-cover" id="player-cover">🎵</div>
+        <div class="player-details">
+            <div class="player-title" id="player-title">No song selected</div>
+            <div class="player-artist" id="player-artist">Select a song to play</div>
+        </div>
+    </div>
+    <div class="player-controls">
+        <button onclick="skipBackward()">⏮</button>
+        <button onclick="togglePlay()" id="play-btn">▶</button>
+        <button onclick="skipForward()">⏭</button>
+    </div>
+    <div class="progress-bar">
+        <span class="time" id="current-time">0:00</span>
+        <div class="progress-container" onclick="seek(event)">
+            <div class="progress" id="progress"></div>
+        </div>
+        <span class="time" id="duration">0:00</span>
+    </div>
+</div>
+
+<!-- Expanded Player Modal -->
+<div id="expanded-player" class="expanded-player">
+    <div class="expanded-player-content">
+        <button class="expanded-close" onclick="closeExpandedPlayer()">✕</button>
+        <div id="expanded-cover" class="expanded-cover">🎵</div>
+        <div id="expanded-title" class="expanded-title">Song Title</div>
+        <div id="expanded-artist" class="expanded-artist">Artist Name</div>
+        <div id="expanded-uploader" class="expanded-uploader">Uploaded by: Username</div>
+        
+        <div class="expanded-progress" onclick="seekExpanded(event)">
+            <div id="expanded-progress-bar" class="expanded-progress-bar"></div>
+        </div>
+        
+        <div class="expanded-time">
+            <span id="expanded-current-time">0:00</span>
+            <span id="expanded-duration">0:00</span>
+        </div>
+        
+        <div class="expanded-controls">
+            <button onclick="skipBackward()">⏮</button>
+            <button onclick="togglePlay()" id="expanded-play-btn">⏸</button>
+            <button onclick="skipForward()">⏭</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <div class="social-links">
+            <a href="#" class="social-link">📘 Facebook</a>
+            <a href="#" class="social-link">📷 Instagram</a>
+            <a href="#" class="social-link">💼 LinkedIn</a>
+            <a href="#" class="social-link">✈️ Telegram</a>
+        </div>
+        <div class="copyright">
+            <p>Designed by mohamadd56</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+// ========== متغیرهای گلوبال ==========
+let currentAudio = null;
+let currentMusicIndex = -1;
+let musicList = [];
+let isPlaying = false;
+let playlistMenuVisible = false;
+let isPlayerExpanded = false;
+let isLogin = false;
+let currentUser = null;
+let currentSlide = 0;
+let likedMusicList = [];
+let currentListType = 'main'; // 'main', 'liked', 'popular'
+let currentMusicList = [];
+
+// ========== المنت های DOM ==========
+const authBtn = document.getElementById('auth-btn');
+const uploadBtn = document.getElementById('upload-btn');
+const playlistsBtn = document.getElementById('playlists-btn');
+const aboutBtn = document.getElementById('about-btn');
+const modal = document.getElementById('auth-modal');
+const uploadPromptModal = document.getElementById('upload-prompt-modal');
+const uploadSection = document.getElementById('upload-section');
+const modalTitle = document.getElementById('modal-title');
+const submitBtn = document.getElementById('submit-btn');
+const toggleText = document.getElementById('toggle-text');
+const modalUsername = document.getElementById('modal-username');
+const modalPassword = document.getElementById('modal-password');
+const bottomPlayer = document.getElementById('bottom-player');
+
+// ========== Event Listeners ==========
+authBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+uploadBtn.addEventListener('click', handleUploadClick);
+playlistsBtn.addEventListener('click', handlePlaylistsClick);
+aboutBtn.addEventListener('click', scrollToAbout);
+toggleText.addEventListener('click', toggleAuthMode);
+submitBtn.addEventListener('click', handleAuthSubmit);
+
+modalUsername.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleAuthSubmit();
+});
+modalPassword.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleAuthSubmit();
+});
+
+// کلیک روی پلیر پایین برای باز کردن پلیر توسعه یافته
+bottomPlayer.addEventListener('click', function(event) {
+    if (event.target === bottomPlayer || 
+        event.target.classList.contains('player-info') ||
+        event.target.classList.contains('player-details') ||
+        event.target.classList.contains('player-title') ||
+        event.target.classList.contains('player-artist') ||
+        event.target.classList.contains('player-cover')) {
+        expandPlayer();
+    }
+});
+
+// ========== سیستم ذخیره و بازیابی وضعیت پخش ==========
+
+function savePlaybackState() {
+    if (currentAudio && musicList[currentMusicIndex]) {
+        const playbackState = {
+            currentTime: currentAudio.currentTime,
+            duration: currentAudio.duration,
+            musicIndex: currentMusicIndex,
+            isPlaying: isPlaying,
+            musicData: musicList[currentMusicIndex],
+            timestamp: Date.now()
+        };
+        localStorage.setItem('playbackState', JSON.stringify(playbackState));
+    }
+}
+
+function loadPlaybackState() {
+    try {
+        const savedState = localStorage.getItem('playbackState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            // چک کن که وضعیت قدیمی نباشد (بیش از 2 ساعت)
+            if (Date.now() - state.timestamp < 7200000) {
+                return state;
+            } else {
+                localStorage.removeItem('playbackState');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading playback state:', error);
+        localStorage.removeItem('playbackState');
+    }
+    return null;
+}
+
+function clearPlaybackState() {
+    localStorage.removeItem('playbackState');
+}
+
+function setupPlaybackStateSaving() {
+    setInterval(savePlaybackState, 1000);
+}
+
+
+
+function toggleAuthMode() {
+    isLogin = !isLogin;
+    modalTitle.innerText = isLogin ? 'Login' : 'Register';
+    toggleText.innerText = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
+    document.getElementById('msg').innerText = '';
+}
+
+function closeAuthModal() {
+    modal.classList.add('hidden');
+    modalUsername.value = '';
+    modalPassword.value = '';
+    document.getElementById('msg').innerText = '';
+}
+
+function handlePlaylistsClick() {
+    const token = localStorage.getItem('access');
+    if (!token) {
+        modal.classList.remove('hidden');
+        isLogin = true;
+        modalTitle.innerText = 'Login';
+    } else {
+        window.location.href = '/my-playlists/';
+    }
+}
+
+function handleUploadClick() {
+    const token = localStorage.getItem('access');
+    if (token) {
+        uploadSection.classList.remove('hidden');
+    } else {
+        uploadPromptModal.classList.remove('hidden');
+    }
+}
+
+function showAuthModal() {
+    uploadPromptModal.classList.add('hidden');
+    modal.classList.remove('hidden');
+}
+
+function hideUploadPromptModal() {
+    uploadPromptModal.classList.add('hidden');
+}
+
+function hideUploadSection() {
+    uploadSection.classList.add('hidden');
+}
+
+function handleAuthSubmit() {
+    const username = modalUsername.value;
+    const password = modalPassword.value;
+    
+    if(!username || !password) { 
+        document.getElementById('msg').innerText = 'Enter both fields'; 
+        return; 
+    }
+
+    const url = isLogin ? '/api/login/' : '/api/register/';
+    
+    fetch(url, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({username,password})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.error) {
+            document.getElementById('msg').innerText = data.error;
+        } else {
+            localStorage.setItem('access', data.access);
+            modal.classList.add('hidden');
+            uploadPromptModal.classList.add('hidden');
+            modalUsername.value = '';
+            modalPassword.value = '';
+            showProfileCircle(data.username);
+            loadMusicList();
+        }
+    })
+    .catch(error => {
+        document.getElementById('msg').innerText = 'Network error. Please try again.';
+    });
+}
+
+
+
+function uploadMusic() {
+    const token = localStorage.getItem('access');
+    if (!token) {
+        document.getElementById('upload-msg').innerText = 'Please login first';
+        return;
+    }
+
+    const title = document.getElementById('music-title').value;
+    const artist = document.getElementById('music-artist').value;
+    const fileInput = document.getElementById('music-file');
+    const coverInput = document.getElementById('music-cover');
+    const file = fileInput.files[0];
+    const cover = coverInput.files[0];
+
+    if (!title || !file) {
+        document.getElementById('upload-msg').innerText = 'Title and audio file are required';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('artist', artist);
+    formData.append('audio_file', file);
+    if (cover) formData.append('cover_image', cover);
+
+    fetch('/api/music/upload/', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById('upload-msg').innerText = data.error;
+        } else {
+            document.getElementById('upload-msg').innerText = data.message;
+            document.getElementById('music-title').value = '';
+            document.getElementById('music-artist').value = '';
+            fileInput.value = '';
+            coverInput.value = '';
+            loadMusicList();
+        }
+    })
+    .catch(error => {
+        document.getElementById('upload-msg').innerText = 'Upload failed. Please try again.';
+    });
+}
+
+
+
+function showProfileCircle(username) {
+    currentUser = username;
+    authBtn.classList.add('hidden');
+    const profileCircle = document.getElementById('profile-circle');
+    profileCircle.classList.remove('hidden');
+    profileCircle.innerText = username.charAt(0).toUpperCase();
+    
+    // حذف event listenerهای قبلی و اضافه کردن جدید
+    profileCircle.onclick = null; // پاک کردن event listenerهای قبلی
+    profileCircle.addEventListener('click', function() {
+        window.location.href = '/profile/';
+    });
+    
+    // همچنین مطمئن شو که استایل درست نمایش داده می‌شود
+    profileCircle.style.cursor = 'pointer';
+    profileCircle.title = 'View Profile';
+}
+
+
+
+function loadMusicList() {
+    fetch('/api/music/list/')
+    .then(res => res.json())
+    .then(data => {
+        musicList = data;
+        displayMusicCarousel();
+        loadPublicPlaylistsForHome();
+    })
+    .catch(error => {
+        console.error('Error loading music:', error);
+    });
+}
+
+function displayMusicCarousel() {
+    const carouselContainer = document.getElementById('carousel-container');
+    carouselContainer.innerHTML = '';
+    
+    // فقط 5 موزیک اول را نمایش بده
+    const displayMusic = musicList.slice(0, 5);
+    
+    displayMusic.forEach((music, index) => {
+        const musicCard = document.createElement('div');
+        musicCard.className = 'music-card carousel-item';
+        musicCard.innerHTML = `
+            <div class="music-cover" onclick="playMusic(${index})">
+                ${music.cover_url ? `<img src="${music.cover_url}" alt="${music.title}" style="width:100%; height:100%; object-fit:cover;">` : '🎵'}
+            </div>
+            <div class="music-info">
+                <div class="music-title">${music.title}</div>
+                <div class="music-artist">${music.artist || 'Unknown Artist'}</div>
+                <div class="music-uploader">Uploaded by: ${music.uploaded_by_username}</div>
+            </div>
+            <button class="like-btn ${music.is_liked ? 'liked' : ''}" onclick="toggleLike(${music.id}, this, event)">♥</button>
+            <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+        `;
+        
+        carouselContainer.appendChild(musicCard);
+    });
+    
+    // تنظیم وضعیت اولیه کاروسل
+    currentSlide = 0;
+    updateCarousel();
+}
+
+function updateCarousel() {
+    const carouselContainer = document.getElementById('carousel-container');
+    const items = carouselContainer.querySelectorAll('.carousel-item');
+    if (items.length > 0) {
+        const itemWidth = items[0].offsetWidth + 20; // عرض آیتم + گپ
+        carouselContainer.style.transform = `translateX(-${currentSlide * itemWidth}px)`;
+    }
+}
+
+function nextSlide() {
+    const totalSlides = Math.min(5, musicList.length);
+    if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateCarousel();
+    }
+}
+
+function prevSlide() {
+    if (currentSlide > 0) {
+        currentSlide--;
+        updateCarousel();
+    }
+}
+
+
+
+function playMusic(index) {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+
+    if (!musicList[index]) {
+        console.error('Music not found at index:', index);
+        return;
+    }
+
+    const music = musicList[index];
+    currentMusicIndex = index;
+    
+    // آپدیت اطلاعات پلیر پایین
+    updatePlayerInfo(music);
+    
+    // ایجاد المان audio جدید
+    currentAudio = new Audio(music.audio_url);
+    
+    // رویدادهای audio
+    currentAudio.addEventListener('loadedmetadata', function() {
+        document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+        document.getElementById('expanded-duration').textContent = formatTime(currentAudio.duration);
+        
+        // بازیابی زمان پخش قبلی اگر وجود دارد
+        const savedState = loadPlaybackState();
+        if (savedState && savedState.musicIndex === index) {
+            const resumeTime = Math.min(savedState.currentTime || 0, currentAudio.duration - 1);
+            currentAudio.currentTime = resumeTime;
+        }
+        
+        // پخش موزیک
+        currentAudio.play().then(() => {
+            isPlaying = true;
+            document.getElementById('play-btn').textContent = '⏸';
+            document.getElementById('expanded-play-btn').textContent = '⏸';
+            savePlaybackState();
+        }).catch(error => {
+            console.error('Play failed:', error);
+        });
+    });
+    
+    currentAudio.addEventListener('timeupdate', function() {
+        if (currentAudio.duration) {
+            const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('expanded-progress-bar').style.width = progress + '%';
+            document.getElementById('current-time').textContent = formatTime(currentAudio.currentTime);
+            document.getElementById('expanded-current-time').textContent = formatTime(currentAudio.currentTime);
+        }
+    });
+    
+    currentAudio.addEventListener('ended', function() {
+        isPlaying = false;
+        document.getElementById('play-btn').textContent = '▶';
+        document.getElementById('expanded-play-btn').textContent = '▶';
+        clearPlaybackState();
+        skipForward();
+    });
+    
+    currentAudio.addEventListener('error', function(e) {
+        console.error('Audio error:', e);
+        showNotification('Error playing music');
+    });
+    
+    // نمایش پلیر
+    bottomPlayer.style.display = 'flex';
+}
+
+function updatePlayerInfo(music) {
+    document.getElementById('player-title').textContent = music.title;
+    document.getElementById('player-artist').textContent = music.artist || 'Unknown Artist';
+    document.getElementById('expanded-title').textContent = music.title;
+    document.getElementById('expanded-artist').textContent = music.artist || 'Unknown Artist';
+    document.getElementById('expanded-uploader').textContent = `Uploaded by: ${music.uploaded_by_username}`;
+    
+    if (music.cover_url) {
+        document.getElementById('player-cover').innerHTML = `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">`;
+        document.getElementById('expanded-cover').innerHTML = `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;border-radius:15px;object-fit:cover;">`;
+    } else {
+        document.getElementById('player-cover').innerHTML = '🎵';
+        document.getElementById('expanded-cover').innerHTML = '🎵';
+    }
+}
+
+function togglePlay() {
+    if (!currentAudio) {
+        // اگر audio نداریم، سعی کن وضعیت قبلی را بازیابی کن
+        const savedState = loadPlaybackState();
+        if (savedState && musicList[savedState.musicIndex]) {
+            playMusic(savedState.musicIndex);
+            return;
+        } else {
+            // اگر هیچ موزیکی در حال پخش نبود، اولین موزیک را پخش کن
+            if (musicList.length > 0) {
+                playMusic(0);
+            }
+            return;
+        }
+    }
+    
+    if (isPlaying) {
+        currentAudio.pause();
+        document.getElementById('play-btn').textContent = '▶';
+        document.getElementById('expanded-play-btn').textContent = '▶';
+    } else {
+        currentAudio.play().then(() => {
+            document.getElementById('play-btn').textContent = '⏸';
+            document.getElementById('expanded-play-btn').textContent = '⏸';
+        }).catch(error => {
+            console.error('Play failed:', error);
+        });
+    }
+    isPlaying = !isPlaying;
+    savePlaybackState();
+}
+
+function skipForward() {
+    if (musicList.length === 0) return;
+    const nextIndex = (currentMusicIndex + 1) % musicList.length;
+    playMusic(nextIndex);
+}
+
+function skipBackward() {
+    if (musicList.length === 0) return;
+    const prevIndex = (currentMusicIndex - 1 + musicList.length) % musicList.length;
+    playMusic(prevIndex);
+}
+
+function seek(event) {
+    if (!currentAudio) return;
+    const progressContainer = event.currentTarget;
+    const clickX = event.offsetX;
+    const width = progressContainer.offsetWidth;
+    const duration = currentAudio.duration;
+    currentAudio.currentTime = (clickX / width) * duration;
+}
+
+function seekExpanded(event) {
+    if (!currentAudio) return;
+    const progressContainer = event.currentTarget;
+    const clickX = event.offsetX;
+    const width = progressContainer.offsetWidth;
+    const duration = currentAudio.duration;
+    currentAudio.currentTime = (clickX / width) * duration;
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+function closePlayer() {
+    if (currentAudio) {
+        currentAudio.pause();
+        // وضعیت را ذخیره کن حتی وقتی پلیر بسته می‌شود
+        savePlaybackState();
+        currentAudio = null;
+    }
+    bottomPlayer.style.display = 'none';
+    isPlaying = false;
+    
+    // اگر پلیر توسعه یافته باز است، ببندش
+    if (isPlayerExpanded) {
+        closeExpandedPlayer();
+    }
+}
+
+function expandPlayer() {
+    const expandedPlayer = document.getElementById('expanded-player');
+    expandedPlayer.style.display = 'flex';
+    isPlayerExpanded = true;
+}
+
+function closeExpandedPlayer() {
+    const expandedPlayer = document.getElementById('expanded-player');
+    expandedPlayer.style.display = 'none';
+    isPlayerExpanded = false;
+}
+
+
+
+function toggleLike(musicId, button, event) {
+    event.stopPropagation();
+    const token = localStorage.getItem('access');
+    if (!token) {
+        modal.classList.remove('hidden');
+        return;
+    }
+
+    fetch(`/api/music/${musicId}/like/`, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            button.classList.toggle('liked', data.liked);
+            if (data.liked) {
+                showNotification('Added to Liked Songs! ❤️');
+            } else {
+                showNotification('Removed from Liked Songs');
+            }
+        }
+    })
+    .catch(error => {
+        showNotification('Error updating like');
+    });
+}
+
+function showPlaylistMenu(songId, event) {
+    event.stopPropagation();
+    const token = localStorage.getItem('access');
+    if (!token) {
+        modal.classList.remove('hidden');
+        return;
+    }
+    
+    closePlaylistMenu();
+    
+    const menu = document.createElement('div');
+    menu.id = 'playlist-menu';
+    menu.className = 'playlist-menu';
+    menu.style.left = (event.pageX - 100) + 'px';
+    menu.style.top = (event.pageY + 10) + 'px';
+    
+    menu.innerHTML = `
+        <div style="margin-bottom: 10px; font-weight: bold; color: #333;">Add to Playlist</div>
+        <div id="playlist-menu-items">
+            <div style="padding: 10px; text-align: center; color: #666;">Loading...</div>
+        </div>
+        <hr style="margin: 10px 0;">
+        <div class="playlist-menu-item" onclick="createPlaylistFromMenu(${songId})" style="color: #ff7b00; font-weight: bold;">
+            + Create New Playlist
+        </div>
+    `;
+    
+    document.body.appendChild(menu);
+    playlistMenuVisible = true;
+    
+    loadUserPlaylistsForMenu(songId);
+    
+    setTimeout(() => {
+        document.addEventListener('click', closePlaylistMenuOnClick);
+    }, 100);
+}
+
+function closePlaylistMenu() {
+    const menu = document.getElementById('playlist-menu');
+    if (menu) {
+        menu.remove();
+    }
+    playlistMenuVisible = false;
+    document.removeEventListener('click', closePlaylistMenuOnClick);
+}
+
+function closePlaylistMenuOnClick(event) {
+    const menu = document.getElementById('playlist-menu');
+    if (menu && !menu.contains(event.target)) {
+        closePlaylistMenu();
+    }
+}
+
+function loadUserPlaylistsForMenu(songId) {
+    fetch('/api/playlists/user-playlists/', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access') }
+    })
+    .then(response => response.json())
+    .then(playlists => {
+        const menuItems = document.getElementById('playlist-menu-items');
+        menuItems.innerHTML = '';
+        
+        // پلی‌لیست لایک شده
+        const likedItem = document.createElement('div');
+        likedItem.className = 'playlist-menu-item';
+        likedItem.innerHTML = '❤️ Liked Songs';
+        likedItem.onclick = () => addToPlaylist('liked_songs', songId);
+        menuItems.appendChild(likedItem);
+        
+        // پلی‌لیست‌های معمولی
+        playlists.forEach(playlist => {
+            const item = document.createElement('div');
+            item.className = 'playlist-menu-item';
+            item.innerHTML = `🎵 ${playlist.name}`;
+            item.onclick = () => addToPlaylist(playlist.id, songId);
+            menuItems.appendChild(item);
+        });
+        
+        if (playlists.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.cssText = 'padding: 10px; text-align: center; color: #666; font-style: italic;';
+            emptyMsg.textContent = 'No playlists yet';
+            menuItems.appendChild(emptyMsg);
+        }
+    })
+    .catch(error => {
+        const menuItems = document.getElementById('playlist-menu-items');
+        menuItems.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Error loading playlists</div>';
+    });
+}
+
+function addToPlaylist(playlistId, songId) {
+    const token = localStorage.getItem('access');
+    fetch('/api/playlists/add-song/', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            playlist_id: playlistId,
+            song_id: songId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        closePlaylistMenu();
+        showNotification(data.message || 'Added to playlist!');
+        
+        if (playlistId === 'liked_songs') {
+            updateSongLikeIcon(songId, true);
+        }
+    })
+    .catch(error => {
+        showNotification('Error adding to playlist');
+    });
+}
+
+function createPlaylistFromMenu(songId) {
+    if (songId) {
+        localStorage.setItem('preselectedSong', songId);
+    }
+    window.location.href = '/create-playlist/';
+}
+
+function updateSongLikeIcon(songId, isLiked) {
+    const buttons = document.querySelectorAll('.like-btn');
+    buttons.forEach(btn => {
+        if (btn.onclick && btn.onclick.toString().includes(songId)) {
+            btn.classList.toggle('liked', isLiked);
+        }
+    });
+}
+
+
+
+function loadPublicPlaylistsForHome() {
+    console.log('🔄 Loading public playlists...');
+    
+    fetch('/api/playlists/public/')
+    .then(response => {
+        console.log('📡 Response status:', response.status, response.statusText);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Raw data received:', data);
+        
+        // مطمئن شو که data یک آرایه است
+        const playlists = Array.isArray(data) ? data : [];
+        console.log('📋 Processed playlists:', playlists);
+        
+        const container = document.getElementById('public-playlists-home');
+        
+        if (!playlists || playlists.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                    <h3>هنوز هیچ پلی‌لیست عمومی‌ای وجود ندارد</h3>
+                    <p>اولین نفری باشید که یک پلی‌لیست عمومی ایجاد می‌کند!</p>
+                    <button class="btn" onclick="handlePlaylistsClick()">ساخت پلی‌لیست</button>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        // فقط 6 پلی‌لیست اول را نمایش بده
+        const displayPlaylists = playlists.slice(0, 6);
+        
+        displayPlaylists.forEach(playlist => {
+            console.log('🎵 Processing playlist:', playlist);
+            html += `
+                <div class="music-card" onclick="openPublicPlaylist(${playlist.id})">
+                    <div class="music-cover">
+                        ${playlist.cover_url ? 
+                            `<img src="${playlist.cover_url}" alt="${playlist.name}" style="width:100%;height:100%;object-fit:cover;">` : 
+                            '🎵'
+                        }
+                    </div>
+                    <div class="music-info">
+                        <div class="music-title">${playlist.name}</div>
+                        <div class="music-artist">ساخته شده توسط: ${playlist.user}</div>
+                        <div class="music-uploader">${playlist.song_count || 0} آهنگ</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    })
+    .catch(error => {
+        console.error('❌ Error loading public playlists:', error);
+        const container = document.getElementById('public-playlists-home');
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3>خطا در بارگذاری پلی‌لیست‌های عمومی</h3>
+                <p>${error.message}</p>
+                <button class="btn" onclick="loadPublicPlaylistsForHome()">تلاش مجدد</button>
+            </div>
+        `;
+    });
+}
+
+function openPublicPlaylist(playlistId) {
+    console.log('🎯 Opening public playlist:', playlistId);
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    window.location.href = '/public-playlist-detail/';
+}
+
+function openPublicPlaylist(playlistId) {
+    console.log('🎯 Opening public playlist:', playlistId);
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    window.location.href = '/public-playlist-detail/';
+}
+
+
+
+function openPublicPlaylist(playlistId) {
+    console.log('Opening public playlist:', playlistId);
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    window.location.href = '/public-playlist-detail/';
+}
+function openPublicPlaylist(playlistId) {
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    window.location.href = '/public-playlist-detail/';
+}
+
+
+
+function scrollToAbout() {
+    document.getElementById('about-section').scrollIntoView({ 
+        behavior: 'smooth' 
+    });
+}
+
+
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkLogin();
+    setupPlaybackStateSaving();
+});
+
+function checkLogin() {
+    const token = localStorage.getItem('access');
+    if(token) {
+        fetch('/api/profile/', {
+            headers:{ 'Authorization':'Bearer '+token }
+        })
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Token invalid');
+        })
+        .then(data => {
+            showProfileCircle(data.username);
+            loadMusicList();
+        })
+        .catch(err => {
+            localStorage.removeItem('access');
+            loadMusicList();
+        });
+    } else {
+        loadMusicList();
+    }
+}
+
+// هنگام بسته شدن صفحه، وضعیت را ذخیره کن
+window.addEventListener('beforeunload', function() {
+    savePlaybackState();
+});
+
+// هنگام بازگشت به صفحه، وضعیت را چک کن
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        setTimeout(() => {
+            const savedState = loadPlaybackState();
+            if (savedState && musicList[savedState.musicIndex]) {
+                const music = musicList[savedState.musicIndex];
+                currentMusicIndex = savedState.musicIndex;
+                
+                // آپدیت اطلاعات پلیر
+                updatePlayerInfo(music);
+                
+                // نمایش پلیر
+                bottomPlayer.style.display = 'flex';
+                
+                // تنظیم وضعیت دکمه پلی
+                if (savedState.isPlaying) {
+                    document.getElementById('play-btn').textContent = '▶';
+                    document.getElementById('expanded-play-btn').textContent = '▶';
+                }
+            }
+        }, 500);
+    }
+});
+
+
+
+function displayMusicCarousel() {
+    const carouselContainer = document.getElementById('carousel-container');
+    carouselContainer.innerHTML = '';
+    
+    console.log('🎵 Displaying music carousel with', musicList.length, 'songs');
+    
+    if (musicList.length === 0) {
+        carouselContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
+                <h3>هنوز هیچ موزیکی آپلود نشده است</h3>
+                <p>اولین نفری باشید که موزیک آپلود می‌کند!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // فقط 5 موزیک اول را نمایش بده
+    const displayMusic = musicList.slice(0, 5);
+    
+    displayMusic.forEach((music, index) => {
+        console.log('🎵 Creating card for:', music.title);
+        const musicCard = document.createElement('div');
+        musicCard.className = 'music-card carousel-item';
+        musicCard.innerHTML = `
+            <div class="music-cover" onclick="playMusic(${index})">
+                ${music.cover_url ? `<img src="${music.cover_url}" alt="${music.title}" style="width:100%; height:100%; object-fit:cover;">` : '🎵'}
+            </div>
+            <div class="music-info">
+                <div class="music-title">${music.title}</div>
+                <div class="music-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                <div class="music-uploader">آپلود شده توسط: ${music.uploaded_by_username}</div>
+            </div>
+            <button class="like-btn ${music.is_liked ? 'liked' : ''}" onclick="toggleLike(${music.id}, this, event)">♥</button>
+            <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+        `;
+        
+        carouselContainer.appendChild(musicCard);
+    });
+    
+    // تنظیم وضعیت اولیه کاروسل
+    currentSlide = 0;
+    updateCarousel();
+}
+
+
+
+
+
+function loadPublicPlaylistsForHome() {
+    console.log('🔄 Loading public playlists...');
+    
+    const token = localStorage.getItem('access');
+    
+    if (!token) {
+        showLoginPrompt();
+        return;
+    }
+    
+    // مستقیماً پلی‌لیست‌ها رو بگیر (بدون تست اول)
+    fetch('/api/playlists/public/', {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(response => {
+        console.log('📡 Response status:', response.status);
+        
+        if (response.status === 401) {
+            localStorage.removeItem('access');
+            showLoginPrompt();
+            throw new Error('Please login again');
+        }
+        
+        if (!response.ok) {
+            // سعی کن خطا رو از response بگیر
+            return response.text().then(text => {
+                let errorMsg = `Server error: ${response.status}`;
+                try {
+                    const errorData = JSON.parse(text);
+                    errorMsg = errorData.error || errorData.debug || errorMsg;
+                } catch (e) {
+                    // اگر JSON نبود، از متن خام استفاده کن
+                    errorMsg = text || errorMsg;
+                }
+                throw new Error(errorMsg);
+            });
+        }
+        
+        return response.json();
+    })
+    .then(playlists => {
+        console.log('✅ Public playlists loaded:', playlists);
+        displayPublicPlaylists(playlists);
+    })
+    .catch(error => {
+        console.error('❌ Error loading public playlists:', error);
+        showPublicPlaylistsFallback(error.message);
+    });
+}
+function displayPublicPlaylists(playlists) {
+    const container = document.getElementById('public-playlists-home');
+    
+    // چک کن که playlists معتبر باشد
+    if (!playlists || !Array.isArray(playlists)) {
+        console.error('❌ Invalid playlists data:', playlists);
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3>Invalid data received from server</h3>
+                <button class="btn" onclick="loadPublicPlaylistsForHome()">Try Again</button>
+            </div>
+        `;
+        return;
+    }
+    
+    if (playlists.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🎵</div>
+                <h3>No public playlists available</h3>
+                <p>Be the first to create a public playlist!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    // فقط 6 پلی‌لیست اول را نمایش بده
+    const displayPlaylists = playlists.slice(0, 6);
+    
+    displayPlaylists.forEach(playlist => {
+        // مقادیر پیش‌فرض برای جلوگیری از خطا
+        const name = playlist.name || 'Unnamed Playlist';
+        const owner = playlist.owner_name || 'User';
+        const songCount = playlist.song_count || 0;
+        const coverUrl = playlist.cover_url;
+        const description = playlist.description || '';
+        
+        html += `
+            <div class="music-card" onclick="openPublicPlaylist(${playlist.id})" 
+                 style="cursor: pointer; position: relative;">
+                <div class="music-cover">
+                    ${coverUrl ? 
+                        `<img src="${coverUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:linear-gradient(45deg, #ff7b00, #ff9133);color:white;">📋</div>'
+                    }
+                </div>
+                <div class="music-info">
+                    <div class="music-title" title="${name}">${name}</div>
+                    <div class="music-artist">By: ${owner}</div>
+                    <div class="music-uploader">${songCount} songs</div>
+                    ${description ? `<div style="font-size: 12px; color: #888; margin-top: 5px;">${description}</div>` : ''}
+                </div>
+                <div style="position: absolute; top: 10px; right: 10px; background: #4CAF50; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold;">
+                    PUBLIC
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    console.log(`🎉 Displayed ${displayPlaylists.length} public playlists`);
+}
+
+function showLoginPrompt() {
+    const container = document.getElementById('public-playlists-home');
+    
+    container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h3>برای مشاهده پلی‌لیست‌های عمومی وارد شوید</h3>
+            <p>با ورود به حساب کاربری می‌توانید از پلی‌لیست‌های عمومی سایر کاربران لذت ببرید</p>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="showAuthModal()">ورود به حساب کاربری</button>
+                <button class="btn" onclick="toggleAuthMode(); showAuthModal()" style="margin-left: 10px;">ثبت‌نام</button>
+            </div>
+        </div>
+    `;
+}
+
+function displayPublicPlaylists(playlists) {
+    const container = document.getElementById('public-playlists-home');
+    
+    if (!playlists || playlists.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🎵</div>
+                <h3>هنوز هیچ پلی‌لیست عمومی‌ای وجود ندارد</h3>
+                <p>اولین نفری باشید که پلی‌لیست عمومی ایجاد می‌کند!</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="handlePlaylistsClick()">ساخت پلی‌لیست عمومی</button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    // فقط 6 پلی‌لیست اول را نمایش بده
+    const displayPlaylists = playlists.slice(0, 6);
+    
+    displayPlaylists.forEach(playlist => {
+        const name = playlist.name || 'پلی‌لیست بدون نام';
+        const owner = playlist.owner_name || 'کاربر';
+        const songCount = playlist.song_count || 0;
+        const coverUrl = playlist.cover_url;
+        
+        html += `
+            <div class="music-card" onclick="openPublicPlaylist(${playlist.id})" 
+                 style="cursor: pointer; position: relative;">
+                <div class="music-cover">
+                    ${coverUrl ? 
+                        `<img src="${coverUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:linear-gradient(45deg, #ff7b00, #ff9133);color:white;">📋</div>'
+                    }
+                </div>
+                <div class="music-info">
+                    <div class="music-title" title="${name}">${name}</div>
+                    <div class="music-artist">ساخته شده توسط: ${owner}</div>
+                    <div class="music-uploader">${songCount} آهنگ</div>
+                    ${playlist.description ? `<div style="font-size: 12px; color: #888; margin-top: 5px;">${playlist.description}</div>` : ''}
+                </div>
+                <div style="position: absolute; top: 10px; right: 10px; background: #4CAF50; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    🔓 عمومی
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    console.log(`🎉 ${displayPlaylists.length} پلی‌لیست عمومی نمایش داده شد`);
+}
+
+function openPublicPlaylist(playlistId) {
+    console.log('🎯 باز کردن پلی‌لیست عمومی:', playlistId);
+    
+    const token = localStorage.getItem('access');
+    if (!token) {
+        showAuthModal();
+        return;
+    }
+    
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    window.location.href = '/public-playlist-detail/';
+}
+
+function showPublicPlaylistsFallback(errorMessage) {
+    const container = document.getElementById('public-playlists-home');
+    
+    container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🔧</div>
+            <h3>خطا در بارگذاری پلی‌لیست‌های عمومی</h3>
+            <p>${errorMessage || 'مشکلی در ارتباط با سرور وجود دارد'}</p>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="loadPublicPlaylistsForHome()">تلاش مجدد</button>
+                <button class="btn" onclick="location.reload()" style="margin-left: 10px;">بارگذاری مجدد صفحه</button>
+            </div>
+        </div>
+    `;
+}
+
+
+let searchTimeout = null;
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeHeaderSearch();
+});
+
+function initializeHeaderSearch() {
+    const headerSearch = document.getElementById('header-search');
+    const headerResults = document.getElementById('header-search-results');
+    
+    if (!headerSearch || !headerResults) {
+        console.error('Search elements not found');
+        return;
+    }
+    
+    headerSearch.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+        
+        if (!query) {
+            headerResults.style.display = 'none';
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            searchMusicHeader(query, headerResults);
+        }, 300);
+    });
+    
+    // کلیک خارج از جستجو برای بستن نتایج
+    document.addEventListener('click', function(e) {
+        if (!headerSearch.contains(e.target) && !headerResults.contains(e.target)) {
+            headerResults.style.display = 'none';
+        }
+    });
+}
+
+function searchMusicHeader(query, resultsContainer) {
+    console.log('🔍 Searching for:', query);
+    
+    fetch(`/api/music/search/?q=${encodeURIComponent(query)}`)
+    .then(response => {
+        if (!response.ok) throw new Error('Search failed');
+        return response.json();
+    })
+    .then(results => {
+        displayHeaderSearchResults(results, query, resultsContainer);
+    })
+    .catch(error => {
+        console.error('Search error:', error);
+        resultsContainer.innerHTML = '<div class="no-results">خطا در جستجو</div>';
+        resultsContainer.style.display = 'block';
+    });
+}
+
+function displayHeaderSearchResults(results, query, resultsContainer) {
+    if (!results || results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="no-results">هیچ نتیجه‌ای برای "${query}" پیدا نشد</div>
+        `;
+        resultsContainer.style.display = 'block';
+        return;
+    }
+    
+    let html = '';
+    
+    // فقط 5 نتیجه اول را نمایش بده
+    const displayResults = results.slice(0, 5);
+    
+    displayResults.forEach(music => {
+        html += `
+            <div class="search-result-item" onclick="playFromHeaderSearch(${music.id})">
+                <div class="search-result-cover">
+                    ${music.cover_url ? 
+                        `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;border-radius:5px;object-fit:cover;">` : 
+                        '🎵'
+                    }
+                </div>
+                <div class="search-result-info">
+                    <div class="search-result-title">${music.title}</div>
+                    <div class="search-result-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    resultsContainer.innerHTML = html;
+    resultsContainer.style.display = 'block';
+}
+
+function playFromHeaderSearch(musicId) {
+    // پنهان کردن نتایج جستجو
+    const headerResults = document.getElementById('header-search-results');
+    const headerSearch = document.getElementById('header-search');
+    
+    if (headerResults) headerResults.style.display = 'none';
+    if (headerSearch) headerSearch.value = '';
+    
+    // پیدا کردن موزیک در لیست اصلی و پخش آن
+    if (window.musicList && window.musicList.length > 0) {
+        const music = window.musicList.find(m => m.id === musicId);
+        if (music) {
+            playMusicDirect(music);
+            return;
+        }
+    }
+    
+    // اگر در لیست اصلی نیست، از API بگیر
+    fetch(`/api/music/list/`)
+    .then(response => response.json())
+    .then(allMusic => {
+        const foundMusic = allMusic.find(m => m.id === musicId);
+        if (foundMusic) {
+            playMusicDirect(foundMusic);
+        } else {
+            alert('موزیک پیدا نشد');
+        }
+    })
+    .catch(error => {
+        console.error('Error playing music:', error);
+        alert('خطا در پخش موزیک');
+    });
+}
+
+// ========== موزیک‌های پرطرفدار ==========
+
+function loadPopularMusic() {
+    console.log('🔥 Loading popular music...');
+    
+    fetch('/api/music/popular/')
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to load popular music');
+        return response.json();
+    })
+    .then(popularMusic => {
+        console.log('✅ Popular music loaded:', popularMusic);
+        displayPopularMusic(popularMusic);
+    })
+    .catch(error => {
+        console.error('❌ Error loading popular music:', error);
+        showPopularMusicFallback();
+    });
+}
+
+function displayPopularMusic(musicList) {
+    const container = document.getElementById('popular-music');
+    
+    if (!container) {
+        console.error('Popular music container not found');
+        return;
+    }
+    
+    if (!musicList || musicList.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3>هنوز هیچ موزیک پرطرفداری وجود ندارد</h3>
+                <p>اولین نفری باشید که موزیک آپلود می‌کند!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    musicList.forEach((music) => {
+        const likeCount = music.like_count || (music.likes ? music.likes.length : 0);
+        
+        html += `
+            <div class="music-card">
+                <div class="music-cover" onclick="playMusicDirect(${JSON.stringify(music).replace(/"/g, '&quot;')})">
+                    ${music.cover_url ? 
+                        `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        '🎵'
+                    }
+                </div>
+                <div class="music-info">
+                    <div class="music-title">${music.title}</div>
+                    <div class="music-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                    <div class="music-uploader">آپلود شده توسط: ${music.uploaded_by_username}</div>
+                    <div style="font-size: 12px; color: #ff7b00; margin-top: 5px;">
+                        ❤️ ${likeCount} لایک
+                    </div>
+                </div>
+                <button class="like-btn ${music.is_liked ? 'liked' : ''}" 
+                        onclick="toggleLike(${music.id}, this, event)">♥</button>
+                <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function showPopularMusicFallback() {
+    const container = document.getElementById('popular-music');
+    if (container) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3>خطا در بارگذاری موزیک‌های پرطرفدار</h3>
+                <button class="btn" onclick="loadPopularMusic()">تلاش مجدد</button>
+            </div>
+        `;
+    }
+}
+
+// ========== تابع پخش موزیک ==========
+
+function playMusicDirect(musicData) {
+    // اگر musicData رشته JSON باشد، تبدیل به object کن
+    if (typeof musicData === 'string') {
+        try {
+            musicData = JSON.parse(musicData);
+        } catch (e) {
+            console.error('Invalid music data:', e);
+            return;
+        }
+    }
+    
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio = null;
+    }
+
+    updatePlayerInfo(musicData);
+    
+    window.currentAudio = new Audio(musicData.audio_url);
+    window.isPlaying = true;
+    
+    window.currentAudio.addEventListener('loadedmetadata', function() {
+        if (window.currentAudio.duration) {
+            document.getElementById('duration').textContent = formatTime(window.currentAudio.duration);
+        }
+        window.currentAudio.play().then(() => {
+            document.getElementById('play-btn').textContent = '⏸';
+        }).catch(error => {
+            console.error('Play failed:', error);
+            alert('خطا در پخش موزیک');
+        });
+    });
+    
+    window.currentAudio.addEventListener('timeupdate', function() {
+        if (window.currentAudio.duration) {
+            const progress = (window.currentAudio.currentTime / window.currentAudio.duration) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('current-time').textContent = formatTime(window.currentAudio.currentTime);
+        }
+    });
+    
+    window.currentAudio.addEventListener('ended', function() {
+        window.isPlaying = false;
+        document.getElementById('play-btn').textContent = '▶';
+    });
+    
+    document.getElementById('bottom-player').style.display = 'flex';
+}
+
+// تابع formatTime اگر وجود ندارد اضافه کنید
+function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+// ========== موزیک‌های پرطرفدار ==========
+
+function loadPopularMusic() {
+    console.log('🔥 درحال بارگذاری موزیک‌های پرطرفدار...');
+    
+    fetch('/api/music/popular/')
+    .then(response => {
+        console.log('📡 وضعیت پاسخ:', response.status);
+        if (!response.ok) {
+            throw new Error(`خطای سرور: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(popularMusic => {
+        console.log('✅ موزیک‌های پرطرفدار دریافت شد:', popularMusic);
+        displayPopularMusic(popularMusic);
+    })
+    .catch(error => {
+        console.error('❌ خطا در بارگذاری موزیک‌های پرطرفدار:', error);
+        showPopularMusicFallback(error.message);
+    });
+}
+
+function displayPopularMusic(musicList) {
+    const container = document.getElementById('popular-music');
+    
+    if (!container) {
+        console.error('❌ المنت popular-music پیدا نشد');
+        return;
+    }
+    
+    if (!musicList || musicList.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <h3>هنوز هیچ موزیک پرطرفداری وجود ندارد</h3>
+                <p>اولین نفری باشید که موزیک آپلود می‌کند!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log(`🎵 نمایش ${musicList.length} موزیک پرطرفدار`);
+    
+    let html = '';
+    
+    musicList.forEach((music, index) => {
+        const likeCount = music.like_count || (music.likes ? music.likes.length : 0);
+        
+        html += `
+            <div class="music-card" onclick="playMusicDirect(${JSON.stringify(music).replace(/"/g, '&quot;')})">
+                <div class="music-cover">
+                    ${music.cover_url ? 
+                        `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        '🎵'
+                    }
+                </div>
+                <div class="music-info">
+                    <div class="music-title" title="${music.title}">${music.title}</div>
+                    <div class="music-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                    <div class="music-uploader">آپلود شده توسط: ${music.uploaded_by_username}</div>
+                    <div style="font-size: 12px; color: #ff7b00; margin-top: 5px;">
+                        ❤️ ${likeCount} لایک
+                    </div>
+                </div>
+                <button class="like-btn ${music.is_liked ? 'liked' : ''}" 
+                        onclick="toggleLike(${music.id}, this, event)">♥</button>
+                <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function showPopularMusicFallback(errorMessage) {
+    const container = document.getElementById('popular-music');
+    if (container) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #666;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🔥</div>
+                <h3>خطا در بارگذاری موزیک‌های پرطرفدار</h3>
+                <p>${errorMessage || 'مشکلی در ارتباط با سرور وجود دارد'}</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="loadPopularMusic()">تلاش مجدد</button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// تابع playMusicDirect که قبلاً داشتیم - مطمئن شویم کار می‌کند
+function playMusicDirect(musicData) {
+    if (typeof musicData === 'string') {
+        try {
+            musicData = JSON.parse(musicData);
+        } catch (e) {
+            console.error('Invalid music data:', e);
+            return;
+        }
+    }
+    
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio = null;
+    }
+
+    updatePlayerInfo(musicData);
+    
+    window.currentAudio = new Audio(musicData.audio_url);
+    window.isPlaying = true;
+    
+    window.currentAudio.addEventListener('loadedmetadata', function() {
+        if (window.currentAudio.duration) {
+            document.getElementById('duration').textContent = formatTime(window.currentAudio.duration);
+        }
+        window.currentAudio.play().then(() => {
+            document.getElementById('play-btn').textContent = '⏸';
+        }).catch(error => {
+            console.error('Play failed:', error);
+            alert('خطا در پخش موزیک');
+        });
+    });
+    
+    window.currentAudio.addEventListener('timeupdate', function() {
+        if (window.currentAudio.duration) {
+            const progress = (window.currentAudio.currentTime / window.currentAudio.duration) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('current-time').textContent = formatTime(window.currentAudio.currentTime);
+        }
+    });
+    
+    window.currentAudio.addEventListener('ended', function() {
+        window.isPlaying = false;
+        document.getElementById('play-btn').textContent = '▶';
+    });
+    
+    document.getElementById('bottom-player').style.display = 'flex';
+}
+
+
+function checkLogin() {
+    const token = localStorage.getItem('access');
+    if(token) {
+        fetch('/api/profile/', {
+            headers:{ 'Authorization':'Bearer '+token }
+        })
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('Token invalid');
+        })
+        .then(data => {
+            showProfileCircle(data.username);
+            loadMusicList();
+            loadPopularMusic(); // این خط را اضافه کنید
+        })
+        .catch(err => {
+            localStorage.removeItem('access');
+            loadMusicList();
+            loadPopularMusic(); // این خط را اضافه کنید
+        });
+    } else {
+        loadMusicList();
+        loadPopularMusic(); // این خط را اضافه کنید
+    }
+}
+
+
+
+
+// ========== کاروسل موزیک‌های پرطرفدار ==========
+let popularCurrentSlide = 0;
+let popularMusicList = [];
+
+function displayPopularMusic(musicList) {
+    popularMusicList = musicList;
+    const carouselContainer = document.getElementById('popular-carousel-container');
+    
+    if (!musicList || musicList.length === 0) {
+        carouselContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
+                <h3>هنوز هیچ موزیک پرطرفداری وجود ندارد</h3>
+                <p>اولین نفری باشید که موزیک آپلود می‌کند!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    // فقط 5 موزیک اول را نمایش بده
+    const displayMusic = musicList.slice(0, 5);
+    
+    displayMusic.forEach((music, index) => {
+        const likeCount = music.like_count || 0;
+        
+        html += `
+            <div class="music-card carousel-item">
+                <div class="music-cover" onclick="playPopularMusic(${index})">
+                    ${music.cover_url ? 
+                        `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        '🎵'
+                    }
+                </div>
+                <div class="music-info">
+                    <div class="music-title">${music.title}</div>
+                    <div class="music-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                    <div class="music-uploader">آپلود شده توسط: ${music.uploaded_by_username}</div>
+                    <div style="font-size: 12px; color: #ff7b00; margin-top: 5px;">
+                        ❤️ ${likeCount} لایک
+                    </div>
+                </div>
+                <button class="like-btn ${music.is_liked ? 'liked' : ''}" onclick="toggleLike(${music.id}, this, event)">♥</button>
+                <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+            </div>
+        `;
+    });
+    
+    carouselContainer.innerHTML = html;
+    popularCurrentSlide = 0;
+    updatePopularCarousel();
+}
+
+function playPopularMusic(index) {
+    // استفاده از متغیرهای global موجود
+    playMusic(index, popularMusicList);
+}
+
+function updatePopularCarousel() {
+    const carouselContainer = document.getElementById('popular-carousel-container');
+    const items = carouselContainer.querySelectorAll('.carousel-item');
+    if (items.length > 0) {
+        const itemWidth = items[0].offsetWidth + 20;
+        carouselContainer.style.transform = `translateX(-${popularCurrentSlide * itemWidth}px)`;
+    }
+}
+
+function nextPopularSlide() {
+    const totalSlides = Math.min(5, popularMusicList.length);
+    if (popularCurrentSlide < totalSlides - 1) {
+        popularCurrentSlide++;
+        updatePopularCarousel();
+    }
+}
+
+function prevPopularSlide() {
+    if (popularCurrentSlide > 0) {
+        popularCurrentSlide--;
+        updatePopularCarousel();
+    }
+}
+
+
+
+function playMusicDirect(musicData, listType = 'main') {
+    if (typeof musicData === 'string') {
+        try {
+            musicData = JSON.parse(musicData);
+        } catch (e) {
+            console.error('Invalid music data:', e);
+            return;
+        }
+    }
+    
+    let targetIndex = -1;
+    let targetList = null;
+    let detectedListType = listType;
+    
+    // جستجو در لیست‌های مختلف به ترتیب اولویت
+    if (likedMusicList && likedMusicList.length > 0) {
+        targetIndex = likedMusicList.findIndex(m => m.id === musicData.id);
+        if (targetIndex !== -1) {
+            targetList = likedMusicList;
+            detectedListType = 'liked';
+        }
+    }
+    
+    if (targetIndex === -1 && popularMusicList && popularMusicList.length > 0) {
+        targetIndex = popularMusicList.findIndex(m => m.id === musicData.id);
+        if (targetIndex !== -1) {
+            targetList = popularMusicList;
+            detectedListType = 'popular';
+        }
+    }
+    
+    if (targetIndex === -1 && window.musicList && window.musicList.length > 0) {
+        targetIndex = window.musicList.findIndex(m => m.id === musicData.id);
+        if (targetIndex !== -1) {
+            targetList = window.musicList;
+            detectedListType = 'main';
+        }
+    }
+    
+    if (targetIndex !== -1 && targetList) {
+        playMusic(targetIndex, targetList, detectedListType);
+    } else {
+        // اگر پیدا نشد، مستقیم پخش کن
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        
+        updatePlayerInfo(musicData);
+        currentAudio = new Audio(musicData.audio_url);
+        
+        currentAudio.addEventListener('loadedmetadata', function() {
+            document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+            currentAudio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('play-btn').textContent = '⏸';
+            }).catch(error => {
+                console.error('Play failed:', error);
+                alert('خطا در پخش موزیک');
+            });
+        });
+        
+        currentAudio.addEventListener('timeupdate', function() {
+            if (currentAudio.duration) {
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+                document.getElementById('current-time').textContent = formatTime(currentAudio.currentTime);
+            }
+        });
+        
+        currentAudio.addEventListener('ended', function() {
+            isPlaying = false;
+            document.getElementById('play-btn').textContent = '▶';
+        });
+        
+        document.getElementById('bottom-player').style.display = 'flex';
+    }
+}
+
+function playMusic(index, musicList = null, listType = 'main') {
+    // بستن موزیک قبلی اگر در حال پخش است
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        isPlaying = false;
+    }
+
+    let targetMusicList;
+    let targetListType = listType;
+
+    // تشخیص لیست هدف
+    if (musicList) {
+        targetMusicList = musicList;
+    } else if (listType === 'liked' && likedMusicList.length > 0) {
+        targetMusicList = likedMusicList;
+    } else if (listType === 'popular' && popularMusicList.length > 0) {
+        targetMusicList = popularMusicList;
+    } else {
+        targetMusicList = window.musicList;
+        targetListType = 'main';
+    }
+
+    if (!targetMusicList || !targetMusicList[index]) {
+        console.error('Music not found at index:', index, 'in list:', targetListType);
+        return;
+    }
+
+    const music = targetMusicList[index];
+    currentMusicIndex = index;
+    
+    // ذخیره نوع لیست فعلی و لیست موزیک‌ها
+    window.currentListType = targetListType;
+    window.currentMusicList = targetMusicList;
+    
+    console.log(`🎵 Playing music from ${targetListType} list, index: ${index}, title: ${music.title}`);
+    
+    // آپدیت اطلاعات پلیر
+    updatePlayerInfo(music);
+    
+    // ایجاد المان audio جدید
+    currentAudio = new Audio(music.audio_url);
+    
+    // رویدادهای audio
+    currentAudio.addEventListener('loadedmetadata', function() {
+        document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+        document.getElementById('expanded-duration').textContent = formatTime(currentAudio.duration);
+        
+        // پخش موزیک
+        currentAudio.play().then(() => {
+            isPlaying = true;
+            document.getElementById('play-btn').textContent = '⏸';
+            document.getElementById('expanded-play-btn').textContent = '⏸';
+        }).catch(error => {
+            console.error('Play failed:', error);
+        });
+    });
+    
+    currentAudio.addEventListener('timeupdate', function() {
+        if (currentAudio.duration) {
+            const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('expanded-progress-bar').style.width = progress + '%';
+            document.getElementById('current-time').textContent = formatTime(currentAudio.currentTime);
+            document.getElementById('expanded-current-time').textContent = formatTime(currentAudio.currentTime);
+        }
+    });
+    
+    currentAudio.addEventListener('ended', function() {
+        isPlaying = false;
+        document.getElementById('play-btn').textContent = '▶';
+        document.getElementById('expanded-play-btn').textContent = '▶';
+        skipForward();
+    });
+    
+    currentAudio.addEventListener('error', function(e) {
+        console.error('Audio error:', e);
+        showNotification('Error playing music');
+    });
+    
+    // نمایش پلیر
+    document.getElementById('bottom-player').style.display = 'flex';
+}
+
+function skipForward() {
+    let targetList;
+    
+    // تشخیص لیست فعلی
+    if (window.currentListType === 'liked' && likedMusicList.length > 0) {
+        targetList = likedMusicList;
+    } else if (window.currentListType === 'popular' && popularMusicList.length > 0) {
+        targetList = popularMusicList;
+    } else {
+        targetList = window.musicList;
+    }
+    
+    if (targetList.length === 0) return;
+    
+    let nextIndex = currentMusicIndex + 1;
+    if (nextIndex >= targetList.length) {
+        nextIndex = 0; // به ابتدای لیست برگرد
+    }
+    
+    playMusic(nextIndex, targetList, window.currentListType || 'main');
+}
+
+function skipBackward() {
+    let targetList;
+    
+    // تشخیص لیست فعلی
+    if (window.currentListType === 'liked' && likedMusicList.length > 0) {
+        targetList = likedMusicList;
+    } else if (window.currentListType === 'popular' && popularMusicList.length > 0) {
+        targetList = popularMusicList;
+    } else {
+        targetList = window.musicList;
+    }
+    
+    if (targetList.length === 0) return;
+    
+    let prevIndex = currentMusicIndex - 1;
+    if (prevIndex < 0) {
+        prevIndex = targetList.length - 1; // به انتهای لیست برو
+    }
+    
+    playMusic(prevIndex, targetList, window.currentListType || 'main');
+}
+
+function displayMusicCarousel() {
+    const carouselContainer = document.getElementById('carousel-container');
+    carouselContainer.innerHTML = '';
+    
+    console.log('🎵 Displaying music carousel with', musicList.length, 'songs');
+    
+    if (musicList.length === 0) {
+        carouselContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
+                <h3>هنوز هیچ موزیکی آپلود نشده است</h3>
+                <p>اولین نفری باشید که موزیک آپلود می‌کند!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // فقط 5 موزیک اول را نمایش بده
+    const displayMusic = musicList.slice(0, 5);
+    
+    displayMusic.forEach((music, index) => {
+        console.log('🎵 Creating card for:', music.title);
+        const musicCard = document.createElement('div');
+        musicCard.className = 'music-card carousel-item';
+        musicCard.innerHTML = `
+            <div class="music-cover" onclick="playMainListMusic(${index})">
+                ${music.cover_url ? `<img src="${music.cover_url}" alt="${music.title}" style="width:100%; height:100%; object-fit:cover;">` : '🎵'}
+            </div>
+            <div class="music-info">
+                <div class="music-title">${music.title}</div>
+                <div class="music-artist">${music.artist || 'هنرمند ناشناس'}</div>
+                <div class="music-uploader">آپلود شده توسط: ${music.uploaded_by_username}</div>
+            </div>
+            <button class="like-btn ${music.is_liked ? 'liked' : ''}" onclick="toggleLike(${music.id}, this, event)">♥</button>
+            <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+        `;
+        
+        carouselContainer.appendChild(musicCard);
+    });
+    
+    // تنظیم وضعیت اولیه کاروسل
+    currentSlide = 0;
+    updateCarousel();
+}
+
+
+function playMainListMusic(index) {
+    playMusic(index, musicList, 'main');
+}
+function playPopularMusic(index) {
+    playMusic(index, popularMusicList, 'popular');
+}
+
+function goToSearchPage() {
+    window.location.href = '/search/';
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            window.location.href = '/search/';
+        });
+    }
+});
+function openPublicPlaylist(playlistId) {
+    console.log('Opening public playlist:', playlistId);
+    localStorage.setItem('currentPublicPlaylistId', playlistId);
+    // استفاده از آدرس موجود
+    window.location.href = '/public-playlist-detail/';
+}
+
+function goToPublicPlaylistsSearch() {
+    window.location.href = '/public-playlists-search/';
+}
+</script>
+
+
+
+</body>
+</html>

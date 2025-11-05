@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Playlists - Muzic56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background-color: #fffaf5; 
+            color: #333;
+            padding-bottom: 80px;
+        }
+        header {
+            background-color: #ff7b00;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+        }
+        .btn {
+            background-color: white;
+            color: #ff7b00;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { 
+            background-color: #ffe0c2;
+            transform: translateY(-2px);
+        }
+        .profile-icon {
+            background-color: white;
+            color: #ff7b00;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .profile-icon:hover {
+            transform: scale(1.1);
+        }
+        .hidden { display: none !important; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .page-title {
+            text-align: center;
+            margin: 20px 0 30px 0;
+            color: #333;
+        }
+
+        .playlists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .playlist-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .playlist-cover {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #ff7b00, #ff9133);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .playlist-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .playlist-info {
+            padding: 20px;
+        }
+        .playlist-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .playlist-details {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .liked-playlist .playlist-cover {
+            background: linear-gradient(45deg, #ff4444, #ff7b00);
+        }
+        
+        .create-playlist {
+            border: 2px dashed #ff7b00;
+            background: #fffaf5;
+        }
+        .create-playlist .playlist-cover {
+            background: #fffaf5;
+            color: #ff7b00;
+            border: 2px dashed #ff7b00;
+        }
+
+        .public-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .public-toggle.public {
+            background: #4CAF50;
+            color: white;
+        }
+        .public-toggle.private {
+            background: #ff7b00;
+            color: white;
+        }
+        .public-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ff4444;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        .delete-btn:hover {
+            background: #ff4444;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .public-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .login-message { 
+            text-align: center; 
+            padding: 50px; 
+            background: white;
+            border-radius: 15px;
+            margin-top: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .login-message h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff7b00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            color: #666;
+            font-size: 16px;
+        }
+        .error-message {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            color: #ff7b00;
+            border-bottom-color: #ff7b00;
+        }
+        .tab:hover {
+            color: #ff7b00;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Muzic56</div>
+    <div>
+        <a href="/" class="btn">Home</a>
+        <div id="profile-circle" class="profile-icon hidden"></div>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="page-title">🎵 My Playlists</h1>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('my-playlists')">My Playlists</button>
+        
+    </div>
+    
+    <div id="content">
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading your playlists...</div>
+        </div>
+        
+        <div id="main-content" style="display: none;">
+            <div id="my-playlists-tab" class="tab-content">
+                <div class="playlists-grid" id="my-playlists-grid">
+                    <!-- پلی‌لیست‌های کاربر اینجا لود می‌شوند -->
+                </div>
+            </div>
+            
+            <div id="public-playlists-tab" class="tab-content" style="display: none;">
+                <div class="playlists-grid" id="public-playlists-grid">
+                    <!-- پلی‌لیست‌های عمومی اینجا لود می‌شوند -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('access');
+    const profileCircle = document.getElementById('profile-circle');
+    let currentTab = 'my-playlists';
+    
+    // ابتدا چک می‌کنیم کاربر لاگین هست یا نه
+    if (!token) {
+        showLoginMessage();
+    } else {
+        // ابتدا پروفایل رو چک می‌کنیم، اگر توکن معتبر نبود به لاگین هدایت می‌شود
+        loadUserProfile();
+    }
+    
+    function showTab(tabName) {
+        currentTab = tabName;
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        document.getElementById('my-playlists-tab').style.display = 'none';
+        document.getElementById('public-playlists-tab').style.display = 'none';
+        document.getElementById(tabName + '-tab').style.display = 'block';
+        
+        if (tabName === 'my-playlists') {
+            loadMyPlaylists();
+        } else if (tabName === 'public-playlists') {
+            loadPublicPlaylists();
+        }
+    }
+    
+    function showLoginMessage() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('main-content').innerHTML = `
+            <div class="login-message">
+                <h2>برای مشاهده پلی‌لیست‌ها باید وارد شوید</h2>
+                <a href="/login/" class="btn">ورود به حساب کاربری</a>
+            </div>
+        `;
+    }
+    
+    function loadUserProfile() {
+        // از endpoint صحیح استفاده می‌کنیم - با توجه به urls.py شما
+        fetch('/api/profile/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Profile load failed - Token may be invalid');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // پروفایل با موفقیت لود شد، حالا پلی‌لیست‌ها رو لود می‌کنیم
+            profileCircle.classList.remove('hidden');
+            profileCircle.innerText = data.username.charAt(0).toUpperCase();
+            profileCircle.onclick = () => window.location.href = '/profile/';
+            
+            // حالا پلی‌لیست‌ها رو لود می‌کنیم
+            loadMyPlaylists();
+        })
+        .catch(error => {
+            console.error('Profile error:', error);
+            // اگر توکن معتبر نبود، حذفش کن و به لاگین برو
+            localStorage.removeItem('access');
+            showLoginMessage();
+        });
+    }
+    
+    function loadMyPlaylists() {
+        // از endpoint صحیح برای پلی‌لیست‌ها استفاده می‌کنیم
+        fetch('/api/playlists/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load playlists: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(playlists => {
+            console.log('Playlists loaded successfully:', playlists);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            displayMyPlaylists(playlists);
+        })
+        .catch(error => {
+            console.error('Error loading playlists:', error);
+            showError('my-playlists-grid', error.message);
+        });
+    }
+    
+    function loadPublicPlaylists() {
+        // برای پلی‌لیست‌های عمومی نیاز به توکن نیست
+        fetch('/api/playlists/public/')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load public playlists');
+            return response.json();
+        })
+        .then(playlists => {
+            displayPublicPlaylists(playlists);
+        })
+        .catch(error => {
+            console.error('Error loading public playlists:', error);
+            showError('public-playlists-grid', 'Error loading public playlists');
+        });
+    }
+    
+    function displayMyPlaylists(playlists) {
+        const grid = document.getElementById('my-playlists-grid');
+        
+        if (!playlists || playlists.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
+                    <h3>No playlists yet</h3>
+                    <p>Create your first playlist!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        // پلی‌لیست لایک شده
+        const likedPlaylist = playlists.find(p => p.is_liked_playlist);
+        if (likedPlaylist) {
+            html += createPlaylistCard(likedPlaylist, true);
+        }
+        
+        // پلی‌لیست‌های معمولی
+        const regularPlaylists = playlists.filter(p => !p.is_liked_playlist);
+        if (regularPlaylists.length === 0) {
+            html += '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #666;">No custom playlists yet</div>';
+        } else {
+            regularPlaylists.forEach(playlist => {
+                html += createPlaylistCard(playlist, false);
+            });
+        }
+        
+        // دکمه ساخت پلی‌لیست جدید
+        html += `
+            <div class="playlist-card create-playlist" onclick="createNewPlaylist()">
+                <div class="playlist-cover">+</div>
+                <div class="playlist-info">
+                    <div class="playlist-name">Create Playlist</div>
+                    <div class="playlist-details">Add new playlist</div>
+                </div>
+            </div>
+        `;
+        
+        grid.innerHTML = html;
+    }
+    
+    function displayPublicPlaylists(playlists) {
+        const grid = document.getElementById('public-playlists-grid');
+        
+        if (!playlists || playlists.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
+                    <h3>No public playlists available</h3>
+                    <p>Be the first to make a playlist public!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        playlists.forEach(playlist => {
+            html += `
+                <div class="playlist-card" onclick="openPublicPlaylist(${playlist.id})">
+                    <div class="playlist-cover">
+                        ${playlist.cover_url ? 
+                            `<img src="${playlist.cover_url}" alt="${playlist.name}" style="width:100%;height:100%;object-fit:cover;">` : 
+                            '🎵'
+                        }
+                    </div>
+                    <div class="playlist-info">
+                        <div class="playlist-name">${playlist.name}</div>
+                        <div class="playlist-details">
+                            <span>${playlist.song_count || 0} songs</span>
+                            <span>By ${playlist.user}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        grid.innerHTML = html;
+    }
+    
+    function createPlaylistCard(playlist, isLiked) {
+        const publicClass = playlist.is_public ? 'public' : 'private';
+        const publicText = playlist.is_public ? '🌍 Public' : '🔒 Private';
+        
+        return `
+            <div class="playlist-card ${isLiked ? 'liked-playlist' : ''}" onclick="openPlaylist('${playlist.id}')">
+                ${!isLiked ? `
+                <button class="public-toggle ${publicClass}" onclick="event.stopPropagation(); togglePublic('${playlist.id}', this)">
+                    ${publicText}
+                </button>
+                <button class="delete-btn" onclick="event.stopPropagation(); deletePlaylist('${playlist.id}')">
+                    🗑️
+                </button>
+                ` : ''}
+                <div class="playlist-cover">
+                    ${playlist.cover_url ? 
+                        `<img src="${playlist.cover_url}" alt="${playlist.name}" style="width:100%;height:100%;object-fit:cover;">` : 
+                        (isLiked ? '❤️' : '🎵')
+                    }
+                </div>
+                <div class="playlist-info">
+                    <div class="playlist-name">
+                        ${playlist.name}
+                        ${playlist.is_public && !isLiked ? '<span class="public-badge">PUBLIC</span>' : ''}
+                    </div>
+                    <div class="playlist-details">${playlist.song_count || 0} songs</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function togglePublic(playlistId, button) {
+        if (!token) {
+            alert('Please login first');
+            return;
+        }
+        
+        fetch(`/api/playlists/${playlistId}/toggle-public/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                if (data.is_public) {
+                    button.classList.remove('private');
+                    button.classList.add('public');
+                    button.innerHTML = '🌍 Public';
+                    
+                    const playlistCard = button.closest('.playlist-card');
+                    const playlistName = playlistCard.querySelector('.playlist-name');
+                    if (!playlistName.querySelector('.public-badge')) {
+                        playlistName.innerHTML += '<span class="public-badge">PUBLIC</span>';
+                    }
+                } else {
+                    button.classList.remove('public');
+                    button.classList.add('private');
+                    button.innerHTML = '🔒 Private';
+                    
+                    const playlistCard = button.closest('.playlist-card');
+                    const publicBadge = playlistCard.querySelector('.public-badge');
+                    if (publicBadge) {
+                        publicBadge.remove();
+                    }
+                }
+                
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling public status:', error);
+            alert('Error changing playlist status');
+        });
+    }
+    
+    function deletePlaylist(playlistId) {
+        if (!confirm('Are you sure you want to delete this playlist?')) {
+            return;
+        }
+        
+        fetch(`/api/playlists/${playlistId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Delete failed');
+            return response.json();
+        })
+        .then(data => {
+            alert('Playlist deleted successfully');
+            loadMyPlaylists();
+        })
+        .catch(error => {
+            console.error('Error deleting playlist:', error);
+            alert('Error deleting playlist');
+        });
+    }
+    
+    function openPlaylist(playlistId) {
+        if (!token) { 
+            alert('Please login first'); 
+            window.location.href = '/login/'; 
+            return; 
+        }
+        console.log('Opening playlist:', playlistId);
+        localStorage.setItem('currentPlaylistId', playlistId);
+        window.location.href = '/playlist-detail/';
+    }
+    
+    function openPublicPlaylist(playlistId) {
+        console.log('Opening public playlist:', playlistId);
+        localStorage.setItem('currentPublicPlaylistId', playlistId);
+        window.location.href = '/public-playlist-detail/';
+    }
+    
+    function createNewPlaylist() {
+        localStorage.removeItem('preselectedSong');
+        window.location.href = '/create-playlist/';
+    }
+    
+    function showError(elementId, message) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #666;">
+                <h3>${message}</h3>
+                <button class="btn" onclick="location.reload()">Retry</button>
+            </div>
+        `;
+    }
+</script>
+
+
+</body>
+</html>

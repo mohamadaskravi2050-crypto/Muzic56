@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Playlist Details - Muzic56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background-color: #fffaf5; 
+            color: #333;
+            padding-bottom: 80px;
+        }
+        header {
+            background-color: #ff7b00;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+        }
+        .btn {
+            background-color: white;
+            color: #ff7b00;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { 
+            background-color: #ffe0c2;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #ff4444;
+            color: white;
+        }
+        .profile-icon {
+            background-color: white;
+            color: #ff7b00;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .profile-icon:hover {
+            transform: scale(1.1);
+        }
+        .hidden { display: none !important; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .playlist-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .playlist-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .playlist-info {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .playlist-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .management-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .songs-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .song-item:hover {
+            background: #f9f9f9;
+            transform: translateX(5px);
+        }
+
+        .song-item:last-child {
+            border-bottom: none;
+        }
+
+        .song-number {
+            width: 30px;
+            text-align: center;
+            color: #666;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .song-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff7b00, #ff9133);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .song-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-artist {
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+        }
+
+        .action-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .like-btn {
+            color: #ccc;
+        }
+
+        .like-btn.liked {
+            color: #ff4444;
+        }
+
+        .play-btn {
+            color: #ff7b00;
+            font-size: 20px;
+        }
+
+        .remove-btn {
+            color: #ff4444;
+        }
+
+        .remove-btn:hover {
+            background: #ff4444;
+            color: white;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ff7b00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 50px;
+        }
+
+        /* مودال */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        /* پلیر پایین صفحه */
+        .bottom-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ff7b00;
+            color: white;
+            padding: 15px 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        .player-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff9133, #ff7b00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .player-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .player-title {
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-artist {
+            font-size: 12px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 2;
+            justify-content: center;
+        }
+        .player-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .player-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .progress-bar {
+            flex: 3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        .time {
+            font-size: 12px;
+            min-width: 40px;
+        }
+        .close-player {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7b00;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .playlist-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .song-item {
+                padding: 10px;
+            }
+            
+            .song-cover {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+            }
+            
+            .song-actions {
+                gap: 5px;
+            }
+            
+            .action-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Muzic56</div>
+    <div>
+        <a href="/" class="btn">Home</a>
+        <a href="/my-playlists/" class="btn">My Playlists</a>
+        <div id="profile-circle" class="profile-icon hidden"></div>
+    </div>
+</header>
+
+<div class="container">
+    <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div>Loading playlist...</div>
+    </div>
+
+    <div id="playlist-content" style="display: none;">
+        <div class="playlist-header">
+            <h1 id="playlist-name" class="playlist-title">Playlist Name</h1>
+            <div id="playlist-info" class="playlist-info">
+                <span id="song-count">0 songs</span>
+                <span id="playlist-owner"></span>
+                <span id="public-badge" class="hidden" style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px;">PUBLIC</span>
+            </div>
+            
+            <div class="playlist-actions">
+                <button class="btn" onclick="playAllSongs()">▶ Play All</button>
+                <button class="btn" onclick="shufflePlay()">🔀 Shuffle</button>
+            </div>
+
+            <div id="management-actions" class="management-actions hidden">
+                <button class="btn btn-success" onclick="openAddSongModal()">➕ Add Songs</button>
+                <button class="btn" onclick="togglePublic()" id="public-toggle-btn">🌍 Make Public</button>
+            </div>
+        </div>
+
+        <div class="songs-list">
+            <div id="songs-container">
+                <!-- آهنگ‌ها اینجا نمایش داده می‌شوند -->
+            </div>
+        </div>
+    </div>
+
+    <div id="error-message" style="display: none; text-align: center; padding: 50px;">
+        <h3>Error loading playlist</h3>
+        <p id="error-text"></p>
+        <button class="btn" onclick="loadPlaylist()">Try Again</button>
+        <a href="/my-playlists/" class="btn">Back to Playlists</a>
+    </div>
+</div>
+
+<!-- مودال اضافه کردن آهنگ -->
+<div id="add-song-modal" class="modal hidden">
+    <div class="modal-content">
+        <h2 class="modal-title">Add Songs to Playlist</h2>
+        <input type="text" id="song-search" class="search-box" placeholder="Search songs..." onkeyup="filterSongs()">
+        <div id="available-songs-list">
+            <!-- لیست آهنگ‌های قابل اضافه کردن -->
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn" onclick="hideAddSongModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- پلیر پایین صفحه -->
+<div id="bottom-player" class="bottom-player">
+    <button class="close-player" onclick="closePlayer()">✕</button>
+    <div class="player-info">
+        <div class="player-cover" id="player-cover">🎵</div>
+        <div class="player-details">
+            <div class="player-title" id="player-title">No song selected</div>
+            <div class="player-artist" id="player-artist">Select a song to play</div>
+        </div>
+    </div>
+    <div class="player-controls">
+        <button onclick="skipBackward()">⏮</button>
+        <button onclick="togglePlay()" id="play-btn">▶</button>
+        <button onclick="skipForward()">⏭</button>
+    </div>
+    <div class="progress-bar">
+        <span class="time" id="current-time">0:00</span>
+        <div class="progress-container" onclick="seek(event)">
+            <div class="progress" id="progress"></div>
+        </div>
+        <span class="time" id="duration">0:00</span>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('access');
+    const playlistId = localStorage.getItem('currentPlaylistId');
+    const profileCircle = document.getElementById('profile-circle');
+    
+    // متغیرهای پخش موزیک
+    let currentAudio = null;
+    let currentSongIndex = -1;
+    let playlistSongs = [];
+    let isPlaying = false;
+    let isLikedPlaylist = false;
+    let currentPlaylistData = null;
+    let allAvailableSongs = [];
+
+    if (!token) {
+        window.location.href = '/login/';
+    } else if (!playlistId) {
+        showError('Playlist ID not found');
+    } else {
+        loadUserProfile();
+        loadPlaylist();
+    }
+
+    function loadUserProfile() {
+        fetch('/api/profile/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Profile load failed');
+            return response.json();
+        })
+        .then(data => {
+            profileCircle.classList.remove('hidden');
+            profileCircle.innerText = data.username.charAt(0).toUpperCase();
+            profileCircle.onclick = () => window.location.href = '/profile/';
+        })
+        .catch(error => {
+            console.error('Profile error:', error);
+        });
+    }
+
+    function loadPlaylist() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('playlist-content').style.display = 'none';
+        document.getElementById('error-message').style.display = 'none';
+
+        fetch(`/api/playlists/${playlistId}/`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load playlist');
+            return response.json();
+        })
+        .then(playlist => {
+            currentPlaylistData = playlist;
+            playlistSongs = playlist.songs || [];
+            isLikedPlaylist = playlistId === 'liked_songs';
+            displayPlaylist(playlist);
+            
+            // نمایش دکمه‌های مدیریت فقط برای پلی‌لیست‌های معمولی
+            if (!isLikedPlaylist) {
+                document.getElementById('management-actions').classList.remove('hidden');
+                updatePublicButton();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading playlist:', error);
+            showError(error.message);
+        });
+    }
+
+    function displayPlaylist(playlist) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('playlist-content').style.display = 'block';
+
+        // آپدیت هدر پلی‌لیست
+        document.getElementById('playlist-name').textContent = playlist.name;
+        document.getElementById('song-count').textContent = `${playlistSongs.length} songs`;
+        
+        if (playlist.owner_username) {
+            document.getElementById('playlist-owner').textContent = ` • Created by: ${playlist.owner_username}`;
+        }
+
+        // نمایش نشان عمومی
+        const publicBadge = document.getElementById('public-badge');
+        if (playlist.is_public) {
+            publicBadge.classList.remove('hidden');
+        } else {
+            publicBadge.classList.add('hidden');
+        }
+
+        // نمایش آهنگ‌ها
+        const songsContainer = document.getElementById('songs-container');
+        
+        if (playlistSongs.length === 0) {
+            songsContainer.innerHTML = `
+                <div class="empty-message">
+                    <p>No songs in this playlist yet</p>
+                    ${!isLikedPlaylist ? `
+                    <button class="btn btn-success" onclick="openAddSongModal()" style="margin-top: 15px;">
+                        Add Your First Song
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+            return;
+        }
+
+        let songsHTML = '';
+        playlistSongs.forEach((song, index) => {
+            songsHTML += `
+                <div class="song-item" onclick="playSong(${index})">
+                    <div class="song-number">${index + 1}</div>
+                    <div class="song-cover">
+                        ${song.cover_url ? 
+                            `<img src="${song.cover_url}" alt="${song.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">` : 
+                            '🎵'
+                        }
+                    </div>
+                    <div class="song-info">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist || 'Unknown Artist'}</div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="action-btn play-btn" onclick="event.stopPropagation(); playSong(${index})" title="Play">
+                            ▶
+                        </button>
+                        <button class="action-btn like-btn ${song.is_liked ? 'liked' : ''}" 
+                                onclick="event.stopPropagation(); toggleLike(${song.id}, this)" title="Like">
+                            ♥
+                        </button>
+                        ${!isLikedPlaylist ? `
+                        <button class="action-btn remove-btn" onclick="event.stopPropagation(); removeFromPlaylist(${song.id})" title="Remove from playlist">
+                            🗑️
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        songsContainer.innerHTML = songsHTML;
+    }
+
+    // توابع پخش موزیک
+    function playSong(index) {
+        if (index < 0 || index >= playlistSongs.length) return;
+        
+        const song = playlistSongs[index];
+        currentSongIndex = index;
+        
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        
+        updatePlayerInfo(song);
+        currentAudio = new Audio(song.audio_url);
+        
+        currentAudio.addEventListener('loadedmetadata', function() {
+            document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+        });
+        
+        currentAudio.addEventListener('timeupdate', function() {
+            if (currentAudio.duration) {
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+                document.getElementById('current-time').textContent = formatTime(currentAudio.currentTime);
+            }
+        });
+        
+        currentAudio.addEventListener('ended', function() {
+            skipForward();
+        });
+        
+        currentAudio.play().then(() => {
+            isPlaying = true;
+            document.getElementById('play-btn').textContent = '⏸';
+        }).catch(error => {
+            console.error('Play failed:', error);
+            alert('Error playing music');
+        });
+        
+        document.getElementById('bottom-player').style.display = 'flex';
+    }
+
+    function playAllSongs() {
+        if (playlistSongs.length > 0) {
+            playSong(0);
+        }
+    }
+
+    function shufflePlay() {
+        if (playlistSongs.length > 0) {
+            const randomIndex = Math.floor(Math.random() * playlistSongs.length);
+            playSong(randomIndex);
+        }
+    }
+
+    function togglePlay() {
+        if (!currentAudio) return;
+        
+        if (isPlaying) {
+            currentAudio.pause();
+            document.getElementById('play-btn').textContent = '▶';
+        } else {
+            currentAudio.play().then(() => {
+                document.getElementById('play-btn').textContent = '⏸';
+            }).catch(error => {
+                console.error('Play failed:', error);
+                alert('Error playing music');
+            });
+        }
+        isPlaying = !isPlaying;
+    }
+
+    function skipForward() {
+        if (playlistSongs.length === 0) return;
+        
+        let nextIndex = currentSongIndex + 1;
+        if (nextIndex >= playlistSongs.length) {
+            nextIndex = 0;
+        }
+        
+        playSong(nextIndex);
+    }
+
+    function skipBackward() {
+        if (playlistSongs.length === 0) return;
+        
+        let prevIndex = currentSongIndex - 1;
+        if (prevIndex < 0) {
+            prevIndex = playlistSongs.length - 1;
+        }
+        
+        playSong(prevIndex);
+    }
+
+    function seek(event) {
+        if (!currentAudio || !currentAudio.duration) return;
+        
+        const progressContainer = event.currentTarget;
+        const clickPosition = event.offsetX;
+        const containerWidth = progressContainer.offsetWidth;
+        const seekTime = (clickPosition / containerWidth) * currentAudio.duration;
+        
+        currentAudio.currentTime = seekTime;
+    }
+
+    function closePlayer() {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        document.getElementById('bottom-player').style.display = 'none';
+        isPlaying = false;
+    }
+
+    function updatePlayerInfo(song) {
+        document.getElementById('player-title').textContent = song.title;
+        document.getElementById('player-artist').textContent = song.artist || 'Unknown Artist';
+        
+        const cover = document.getElementById('player-cover');
+        if (song.cover_url) {
+            cover.innerHTML = `<img src="${song.cover_url}" alt="${song.title}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+        } else {
+            cover.innerHTML = '🎵';
+        }
+    }
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // توابع مدیریت پلی‌لیست
+    function toggleLike(songId, button) {
+        fetch(`/api/music/${songId}/like/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                button.classList.toggle('liked', data.liked);
+            }
+        })
+        .catch(error => {
+            console.error('Like error:', error);
+            alert('Error updating like');
+        });
+    }
+
+    function openAddSongModal() {
+        fetch('/api/music/list/')
+        .then(response => response.json())
+        .then(songs => {
+            allAvailableSongs = songs;
+            displayAvailableSongs(songs);
+            document.getElementById('add-song-modal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error loading songs:', error);
+            alert('Error loading available songs');
+        });
+    }
+
+    function hideAddSongModal() {
+        document.getElementById('add-song-modal').classList.add('hidden');
+    }
+
+    function displayAvailableSongs(songs) {
+        const songsList = document.getElementById('available-songs-list');
+        let songsHTML = '';
+        
+        const currentSongIds = playlistSongs.map(song => song.id);
+        
+        const availableSongs = songs.filter(song => !currentSongIds.includes(song.id));
+        
+        if (availableSongs.length === 0) {
+            songsHTML = '<p style="text-align: center; color: #666; padding: 20px;">No songs available to add</p>';
+        } else {
+            availableSongs.forEach(song => {
+                songsHTML += `
+                    <div class="song-item" onclick="addSongToPlaylist(${song.id})">
+                        <div class="song-cover">
+                            ${song.cover_url ? 
+                                `<img src="${song.cover_url}" alt="${song.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">` : 
+                                '🎵'
+                            }
+                        </div>
+                        <div class="song-info">
+                            <div class="song-title">${song.title}</div>
+                            <div class="song-artist">${song.artist || 'Unknown Artist'}</div>
+                        </div>
+                        <button class="btn btn-success" onclick="event.stopPropagation(); addSongToPlaylist(${song.id})">
+                            Add
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        songsList.innerHTML = songsHTML;
+    }
+
+    function filterSongs() {
+        const searchTerm = document.getElementById('song-search').value.toLowerCase();
+        const filteredSongs = allAvailableSongs.filter(song => 
+            song.title.toLowerCase().includes(searchTerm) || 
+            (song.artist && song.artist.toLowerCase().includes(searchTerm))
+        );
+        displayAvailableSongs(filteredSongs);
+    }
+
+    function addSongToPlaylist(songId) {
+        fetch('/api/playlists/add-song/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                playlist_id: playlistId,
+                song_id: songId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert('Song added to playlist!');
+                hideAddSongModal();
+                loadPlaylist();
+            }
+        })
+        .catch(error => {
+            console.error('Error adding song:', error);
+            alert('Error adding song to playlist');
+        });
+    }
+
+    function removeFromPlaylist(songId) {
+        if (!confirm('Are you sure you want to remove this song from the playlist?')) {
+            return;
+        }
+        
+        fetch(`/api/playlists/${playlistId}/remove-song/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                song_id: songId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert('Song removed from playlist');
+                loadPlaylist();
+            }
+        })
+        .catch(error => {
+            console.error('Error removing song:', error);
+            alert('Error removing song from playlist');
+        });
+    }
+
+    function togglePublic() {
+        fetch(`/api/playlists/${playlistId}/toggle-public/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert(data.message);
+                updatePublicButton();
+                loadPlaylist();
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling public status:', error);
+            alert('Error changing playlist status');
+        });
+    }
+
+    function updatePublicButton() {
+        const button = document.getElementById('public-toggle-btn');
+        if (currentPlaylistData && currentPlaylistData.is_public) {
+            button.innerHTML = '🔒 Make Private';
+            button.classList.add('btn-danger');
+            button.classList.remove('btn-success');
+        } else {
+            button.innerHTML = '🌍 Make Public';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-danger');
+        }
+    }
+
+    function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('playlist-content').style.display = 'none';
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('error-text').textContent = message;
+    }
+
+    // بستن مودال با کلیک خارج از آن
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('add-song-modal');
+        if (event.target === modal) {
+            hideAddSongModal();
+        }
+    });
+</script>
+</body>
+</html>

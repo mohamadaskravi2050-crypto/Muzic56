@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search - Muzic56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background-color: #fffaf5; 
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #ff7b00;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: bold; }
+        .btn {
+            background-color: white;
+            color: #ff7b00;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { 
+            background-color: #ffe0c2;
+            transform: translateY(-2px);
+        }
+        .profile-icon {
+            background-color: white;
+            color: #ff7b00;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .profile-icon:hover {
+            transform: scale(1.1);
+        }
+        .hidden { display: none !important; }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: 2px solid #ff7b00;
+            font-size: 16px;
+            outline: none;
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #ff9133;
+            box-shadow: 0 0 10px rgba(255, 123, 0, 0.3);
+        }
+
+        .search-results {
+            margin-top: 30px;
+        }
+
+        .results-count {
+            margin-bottom: 20px;
+            color: #666;
+            text-align: center;
+        }
+
+        /* استایل برای نمایش مربعی موزیک ها */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .music-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .music-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .music-cover {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(45deg, #ff7b00, #ff9133);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+        .music-info {
+            padding: 15px;
+        }
+        .music-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .music-artist {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .music-uploader {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        /* دکمه لایک */
+        .like-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .like-btn:hover {
+            transform: scale(1.2);
+        }
+        .like-btn.liked {
+            color: #ff4444;
+        }
+
+        /* دکمه اضافه کردن به پلی‌لیست */
+        .add-to-playlist-btn {
+            background: none;
+            border: none;
+            color: #ff7b00;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .add-to-playlist-btn:hover {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff7b00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 30px;
+        }
+
+        /* پلیر پایین صفحه */
+        .bottom-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ff7b00;
+            color: white;
+            padding: 15px 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        .player-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff9133, #ff7b00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        .player-details {
+            flex: 1;
+        }
+        .player-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .player-artist {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 2;
+            justify-content: center;
+        }
+        .player-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .player-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .progress-bar {
+            flex: 3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        .time {
+            font-size: 12px;
+            min-width: 40px;
+        }
+        .close-player {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7b00;
+            font-weight: bold;
+        }
+
+        /* منوی پلی‌لیست */
+        .playlist-menu {
+            position: fixed;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 1001;
+            max-height: 300px;
+            overflow-y: auto;
+            min-width: 200px;
+        }
+        .playlist-menu-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .playlist-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        /* نوتیفیکیشن */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 1002;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Muzic56</div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="/" class="btn">🏠 Home</a>
+        <button id="auth-btn" class="btn">Register / Login</button>
+        <div id="profile-circle" class="profile-icon hidden"></div>
+    </div>
+</header>
+
+<main>
+    <div class="search-header">
+        <h1>Search Music 🎵</h1>
+        <p>Find your favorite songs and artists</p>
+    </div>
+
+    <input type="text" id="search-input" class="search-box" placeholder="Search for songs, artists..." autocomplete="off">
+
+    <div class="search-results">
+        <div id="results-count" class="results-count"></div>
+        
+        <div id="loading" class="loading-container" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div>Searching...</div>
+        </div>
+
+        <div id="search-results-container" class="music-grid">
+            <!-- نتایج جستجو اینجا نمایش داده می‌شوند -->
+        </div>
+    </div>
+</main>
+
+<!-- Auth Modal -->
+<div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeAuthModal()">✕</button>
+        <h2 id="modal-title">Register</h2>
+        <input type="text" id="modal-username" placeholder="Username"><br>
+        <input type="password" id="modal-password" placeholder="Password"><br>
+        <button class="submit-btn" id="submit-btn">Submit</button>
+        <p id="msg" style="color:red;"></p>
+        <p id="toggle-text" style="cursor:pointer; color:#ff7b00;">Already have an account? Login</p>
+    </div>
+</div>
+
+<!-- Bottom Music Player -->
+<div id="bottom-player" class="bottom-player">
+    <button class="close-player" onclick="closePlayer()">✕</button>
+    <div class="player-info">
+        <div class="player-cover" id="player-cover">🎵</div>
+        <div class="player-details">
+            <div class="player-title" id="player-title">No song selected</div>
+            <div class="player-artist" id="player-artist">Select a song to play</div>
+        </div>
+    </div>
+    <div class="player-controls">
+        <button onclick="skipBackward()">⏮</button>
+        <button onclick="togglePlay()" id="play-btn">▶</button>
+        <button onclick="skipForward()">⏭</button>
+    </div>
+    <div class="progress-bar">
+        <span class="time" id="current-time">0:00</span>
+        <div class="progress-container" onclick="seek(event)">
+            <div class="progress" id="progress"></div>
+        </div>
+        <span class="time" id="duration">0:00</span>
+    </div>
+</div>
+
+<script>
+    // ========== متغیرهای گلوبال ==========
+    let currentAudio = null;
+    let currentMusicIndex = -1;
+    let searchResults = [];
+    let isPlaying = false;
+    let isLogin = false;
+    let currentUser = null;
+    let searchTimeout = null;
+    let playlistMenuVisible = false;
+
+    // ========== المنت های DOM ==========
+    const authBtn = document.getElementById('auth-btn');
+    const profileCircle = document.getElementById('profile-circle');
+    const searchInput = document.getElementById('search-input');
+    const searchResultsContainer = document.getElementById('search-results-container');
+    const resultsCount = document.getElementById('results-count');
+    const loading = document.getElementById('loading');
+    const authModal = document.getElementById('auth-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleText = document.getElementById('toggle-text');
+    const modalUsername = document.getElementById('modal-username');
+    const modalPassword = document.getElementById('modal-password');
+    const bottomPlayer = document.getElementById('bottom-player');
+
+    // ========== Event Listeners ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        checkLogin();
+        setupSearch();
+    });
+
+    authBtn.addEventListener('click', () => authModal.classList.remove('hidden'));
+    toggleText.addEventListener('click', toggleAuthMode);
+    submitBtn.addEventListener('click', handleAuthSubmit);
+
+    modalUsername.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleAuthSubmit();
+    });
+    modalPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleAuthSubmit();
+    });
+
+    // ========== سیستم جستجو ==========
+    function setupSearch() {
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            if (!query) {
+                clearResults();
+                return;
+            }
+            
+            loading.style.display = 'block';
+            searchResultsContainer.innerHTML = '';
+            
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 500);
+        });
+        
+        // جستجو با Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    loading.style.display = 'block';
+                    searchResultsContainer.innerHTML = '';
+                    performSearch(query);
+                }
+            }
+        });
+    }
+
+    function performSearch(query) {
+        console.log('🔍 Searching for:', query);
+        
+        fetch(`/api/music/search/?q=${encodeURIComponent(query)}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Search failed');
+            return response.json();
+        })
+        .then(results => {
+            loading.style.display = 'none';
+            displaySearchResults(results, query);
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            loading.style.display = 'none';
+            searchResultsContainer.innerHTML = '<div class="no-results">Error performing search</div>';
+        });
+    }
+
+    function displaySearchResults(results, query) {
+        searchResults = results;
+        
+        if (!results || results.length === 0) {
+            searchResultsContainer.innerHTML = `
+                <div class="no-results">
+                    <h3>No results found for "${query}"</h3>
+                    <p>Try different keywords or browse all music</p>
+                </div>
+            `;
+            resultsCount.textContent = '';
+            return;
+        }
+        
+        resultsCount.textContent = `Found ${results.length} result${results.length === 1 ? '' : 's'}`;
+        
+        let html = '';
+        results.forEach((music, index) => {
+            html += `
+                <div class="music-card">
+                    <div class="music-cover" onclick="playMusic(${index})">
+                        ${music.cover_url ? 
+                            `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;object-fit:cover;">` : 
+                            '🎵'
+                        }
+                    </div>
+                    <div class="music-info">
+                        <div class="music-title">${music.title}</div>
+                        <div class="music-artist">${music.artist || 'Unknown Artist'}</div>
+                        <div class="music-uploader">Uploaded by: ${music.uploaded_by_username}</div>
+                    </div>
+                    <button class="like-btn ${music.is_liked ? 'liked' : ''}" onclick="toggleLike(${music.id}, this, event)">♥</button>
+                    <button class="add-to-playlist-btn" onclick="showPlaylistMenu(${music.id}, event)">+</button>
+                </div>
+            `;
+        });
+        
+        searchResultsContainer.innerHTML = html;
+    }
+
+    function clearResults() {
+        searchResultsContainer.innerHTML = '';
+        resultsCount.textContent = '';
+        searchResults = [];
+    }
+
+    // ========== سیستم پخش موزیک ==========
+    function playMusic(index) {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+
+        if (!searchResults[index]) {
+            console.error('Music not found at index:', index);
+            return;
+        }
+
+        const music = searchResults[index];
+        currentMusicIndex = index;
+        
+        updatePlayerInfo(music);
+        
+        currentAudio = new Audio(music.audio_url);
+        
+        currentAudio.addEventListener('loadedmetadata', function() {
+            document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+            
+            currentAudio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('play-btn').textContent = '⏸';
+            }).catch(error => {
+                console.error('Play failed:', error);
+            });
+        });
+        
+        currentAudio.addEventListener('timeupdate', function() {
+            if (currentAudio.duration) {
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+                document.getElementById('current-time').textContent = formatTime(currentAudio.currentTime);
+            }
+        });
+        
+        currentAudio.addEventListener('ended', function() {
+            isPlaying = false;
+            document.getElementById('play-btn').textContent = '▶';
+            skipForward();
+        });
+        
+        currentAudio.addEventListener('error', function(e) {
+            console.error('Audio error:', e);
+            showNotification('Error playing music');
+        });
+        
+        bottomPlayer.style.display = 'flex';
+    }
+
+    function updatePlayerInfo(music) {
+        document.getElementById('player-title').textContent = music.title;
+        document.getElementById('player-artist').textContent = music.artist || 'Unknown Artist';
+        
+        if (music.cover_url) {
+            document.getElementById('player-cover').innerHTML = `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">`;
+        } else {
+            document.getElementById('player-cover').innerHTML = '🎵';
+        }
+    }
+
+    function togglePlay() {
+        if (!currentAudio) return;
+        
+        if (isPlaying) {
+            currentAudio.pause();
+            document.getElementById('play-btn').textContent = '▶';
+        } else {
+            currentAudio.play().then(() => {
+                document.getElementById('play-btn').textContent = '⏸';
+            }).catch(error => {
+                console.error('Play failed:', error);
+            });
+        }
+        isPlaying = !isPlaying;
+    }
+
+    function skipForward() {
+        if (searchResults.length === 0) return;
+        const nextIndex = (currentMusicIndex + 1) % searchResults.length;
+        playMusic(nextIndex);
+    }
+
+    function skipBackward() {
+        if (searchResults.length === 0) return;
+        const prevIndex = (currentMusicIndex - 1 + searchResults.length) % searchResults.length;
+        playMusic(prevIndex);
+    }
+
+    function seek(event) {
+        if (!currentAudio) return;
+        const progressContainer = event.currentTarget;
+        const clickX = event.offsetX;
+        const width = progressContainer.offsetWidth;
+        const duration = currentAudio.duration;
+        currentAudio.currentTime = (clickX / width) * duration;
+    }
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function closePlayer() {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        bottomPlayer.style.display = 'none';
+        isPlaying = false;
+    }
+
+    // ========== سیستم لایک و پلی‌لیست ==========
+    function toggleLike(musicId, button, event) {
+        event.stopPropagation();
+        const token = localStorage.getItem('access');
+        if (!token) {
+            authModal.classList.remove('hidden');
+            return;
+        }
+
+        fetch(`/api/music/${musicId}/like/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                button.classList.toggle('liked', data.liked);
+                if (data.liked) {
+                    showNotification('Added to Liked Songs! ❤️');
+                } else {
+                    showNotification('Removed from Liked Songs');
+                }
+            }
+        })
+        .catch(error => {
+            showNotification('Error updating like');
+        });
+    }
+
+    function showPlaylistMenu(songId, event) {
+        event.stopPropagation();
+        const token = localStorage.getItem('access');
+        if (!token) {
+            authModal.classList.remove('hidden');
+            return;
+        }
+        
+        closePlaylistMenu();
+        
+        const menu = document.createElement('div');
+        menu.id = 'playlist-menu';
+        menu.className = 'playlist-menu';
+        menu.style.left = (event.pageX - 100) + 'px';
+        menu.style.top = (event.pageY + 10) + 'px';
+        
+        menu.innerHTML = `
+            <div style="margin-bottom: 10px; font-weight: bold; color: #333;">Add to Playlist</div>
+            <div id="playlist-menu-items">
+                <div style="padding: 10px; text-align: center; color: #666;">Loading...</div>
+            </div>
+            <hr style="margin: 10px 0;">
+            <div class="playlist-menu-item" onclick="createPlaylistFromMenu(${songId})" style="color: #ff7b00; font-weight: bold;">
+                + Create New Playlist
+            </div>
+        `;
+        
+        document.body.appendChild(menu);
+        playlistMenuVisible = true;
+        
+        loadUserPlaylistsForMenu(songId);
+        
+        setTimeout(() => {
+            document.addEventListener('click', closePlaylistMenuOnClick);
+        }, 100);
+    }
+
+    function closePlaylistMenu() {
+        const menu = document.getElementById('playlist-menu');
+        if (menu) {
+            menu.remove();
+        }
+        playlistMenuVisible = false;
+        document.removeEventListener('click', closePlaylistMenuOnClick);
+    }
+
+    function closePlaylistMenuOnClick(event) {
+        const menu = document.getElementById('playlist-menu');
+        if (menu && !menu.contains(event.target)) {
+            closePlaylistMenu();
+        }
+    }
+
+    function loadUserPlaylistsForMenu(songId) {
+        fetch('/api/playlists/user-playlists/', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access') }
+        })
+        .then(response => response.json())
+        .then(playlists => {
+            const menuItems = document.getElementById('playlist-menu-items');
+            menuItems.innerHTML = '';
+            
+            // پلی‌لیست لایک شده
+            const likedItem = document.createElement('div');
+            likedItem.className = 'playlist-menu-item';
+            likedItem.innerHTML = '❤️ Liked Songs';
+            likedItem.onclick = () => addToPlaylist('liked_songs', songId);
+            menuItems.appendChild(likedItem);
+            
+            // پلی‌لیست‌های معمولی
+            playlists.forEach(playlist => {
+                const item = document.createElement('div');
+                item.className = 'playlist-menu-item';
+                item.innerHTML = `🎵 ${playlist.name}`;
+                item.onclick = () => addToPlaylist(playlist.id, songId);
+                menuItems.appendChild(item);
+            });
+            
+            if (playlists.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.cssText = 'padding: 10px; text-align: center; color: #666; font-style: italic;';
+                emptyMsg.textContent = 'No playlists yet';
+                menuItems.appendChild(emptyMsg);
+            }
+        })
+        .catch(error => {
+            const menuItems = document.getElementById('playlist-menu-items');
+            menuItems.innerHTML = '<div style="padding: 10px; text-align: center; color: #666;">Error loading playlists</div>';
+        });
+    }
+
+    function addToPlaylist(playlistId, songId) {
+        const token = localStorage.getItem('access');
+        fetch('/api/playlists/add-song/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                playlist_id: playlistId,
+                song_id: songId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            closePlaylistMenu();
+            showNotification(data.message || 'Added to playlist!');
+            
+            if (playlistId === 'liked_songs') {
+                updateSongLikeIcon(songId, true);
+            }
+        })
+        .catch(error => {
+            showNotification('Error adding to playlist');
+        });
+    }
+
+    function createPlaylistFromMenu(songId) {
+        if (songId) {
+            localStorage.setItem('preselectedSong', songId);
+        }
+        window.location.href = '/create-playlist/';
+    }
+
+    function updateSongLikeIcon(songId, isLiked) {
+        const buttons = document.querySelectorAll('.like-btn');
+        buttons.forEach(btn => {
+            if (btn.onclick && btn.onclick.toString().includes(songId)) {
+                btn.classList.toggle('liked', isLiked);
+            }
+        });
+    }
+
+    // ========== توابع احراز هویت ==========
+    function toggleAuthMode() {
+        isLogin = !isLogin;
+        modalTitle.innerText = isLogin ? 'Login' : 'Register';
+        toggleText.innerText = isLogin ? "Don't have an account? Register" : "Already have an account? Login";
+        document.getElementById('msg').innerText = '';
+    }
+
+    function closeAuthModal() {
+        authModal.classList.add('hidden');
+        modalUsername.value = '';
+        modalPassword.value = '';
+        document.getElementById('msg').innerText = '';
+    }
+
+    function handleAuthSubmit() {
+        const username = modalUsername.value;
+        const password = modalPassword.value;
+        
+        if(!username || !password) { 
+            document.getElementById('msg').innerText = 'Enter both fields'; 
+            return; 
+        }
+
+        const url = isLogin ? '/api/login/' : '/api/register/';
+        
+        fetch(url, {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({username,password})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.error) {
+                document.getElementById('msg').innerText = data.error;
+            } else {
+                localStorage.setItem('access', data.access);
+                authModal.classList.add('hidden');
+                modalUsername.value = '';
+                modalPassword.value = '';
+                showProfileCircle(data.username);
+            }
+        })
+        .catch(error => {
+            document.getElementById('msg').innerText = 'Network error. Please try again.';
+        });
+    }
+
+    function showProfileCircle(username) {
+        currentUser = username;
+        authBtn.classList.add('hidden');
+        profileCircle.classList.remove('hidden');
+        profileCircle.innerText = username.charAt(0).toUpperCase();
+        
+        profileCircle.onclick = null;
+        profileCircle.addEventListener('click', function() {
+            window.location.href = '/profile/';
+        });
+        
+        profileCircle.style.cursor = 'pointer';
+        profileCircle.title = 'View Profile';
+    }
+
+    function checkLogin() {
+        const token = localStorage.getItem('access');
+        if(token) {
+            fetch('/api/profile/', {
+                headers:{ 'Authorization':'Bearer '+token }
+            })
+            .then(res => {
+                if (res.ok) return res.json();
+                throw new Error('Token invalid');
+            })
+            .then(data => {
+                showProfileCircle(data.username);
+            })
+            .catch(err => {
+                localStorage.removeItem('access');
+            });
+        }
+    }
+
+    // ========== نمایش نوتیفیکیشن ==========
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // استایل مودال (اضافه کردن به استایل‌ها)
+    const style = document.createElement('style');
+    style.textContent = `
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-close:hover {
+            color: #ff7b00;
+        }
+        input, textarea { 
+            width: 90%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        button.submit-btn { 
+            background-color: #ff7b00; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 25px; 
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        button.submit-btn:hover { 
+            background-color: #ff9133;
+            transform: translateY(-2px);
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+</body>
+</html>

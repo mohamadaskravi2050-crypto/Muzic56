@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Playlist - Muzic56</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* استایل‌های مشابه صفحه پلی‌لیست معمولی */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial; background: #fffaf5; color: #333; }
+        
+        header {
+            background: #ff7b00; color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 24px; font-weight: bold; }
+        .btn {
+            background: white; color: #ff7b00; border: none; padding: 10px 20px;
+            border-radius: 25px; font-weight: bold; cursor: pointer; text-decoration: none;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .playlist-header {
+            background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center;
+        }
+        .playlist-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+        .playlist-info { color: #666; margin-bottom: 20px; }
+        
+        .songs-list { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .song-item {
+            display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .song-item:hover { background: #f9f9f9; }
+        .song-cover {
+            width: 60px; height: 60px; border-radius: 8px; background: linear-gradient(45deg, #ff7b00, #ff9133);
+            display: flex; align-items: center; justify-content: center; color: white; margin-right: 15px;
+        }
+        .song-info { flex: 1; }
+        .song-title { font-weight: bold; margin-bottom: 5px; }
+        .song-artist { color: #666; font-size: 14px; }
+        
+        .public-badge {
+            background: #4CAF50; color: white; padding: 4px 8px; border-radius: 10px;
+            font-size: 12px; font-weight: bold; margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Muzic56</div>
+        <div>
+            <a href="/" class="btn">🏠 Home</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="loading" style="text-align: center; padding: 50px;">
+            <div>Loading playlist...</div>
+        </div>
+
+        <div id="playlist-content" style="display: none;">
+            <div class="playlist-header">
+                <h1 id="playlist-name" class="playlist-title"></h1>
+                <div id="playlist-info" class="playlist-info"></div>
+                <button class="btn" onclick="playAllSongs()">▶ Play All</button>
+            </div>
+
+            <div class="songs-list">
+                <div id="songs-container"></div>
+            </div>
+        </div>
+
+        <div id="error-message" style="display: none; text-align: center; padding: 50px;">
+            <h3>Error loading playlist</h3>
+            <p id="error-text"></p>
+            <a href="/" class="btn">Back to Home</a>
+        </div>
+    </div>
+
+    <!-- پلیر پایین صفحه -->
+    <div id="bottom-player" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #ff7b00; color: white; padding: 15px 20px;">
+        <!-- کد پلیر مثل قبلی -->
+    </div>
+
+    <script>
+        const playlistId = localStorage.getItem('currentPublicPlaylistId');
+        let currentPlaylistSongs = [];
+        let currentAudio = null;
+        let currentSongIndex = -1;
+        let isPlaying = false;
+
+        if (!playlistId) {
+            showError('Playlist ID not found');
+        } else {
+            loadPublicPlaylist();
+        }
+
+        function loadPublicPlaylist() {
+            fetch(`/api/playlists/public-simple/${playlistId}/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load playlist');
+                return response.json();
+            })
+            .then(playlist => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('playlist-content').style.display = 'block';
+                
+                currentPlaylistSongs = playlist.songs || [];
+                
+                // نمایش اطلاعات پلی‌لیست
+                document.getElementById('playlist-name').textContent = playlist.name;
+                document.getElementById('playlist-info').innerHTML = `
+                    ${playlist.song_count} songs • Created by: ${playlist.owner}
+                    <span class="public-badge">PUBLIC</span>
+                `;
+                
+                // نمایش آهنگ‌ها
+                displaySongs(currentPlaylistSongs);
+            })
+            .catch(error => {
+                showError(error.message);
+            });
+        }
+
+        function displaySongs(songs) {
+            const container = document.getElementById('songs-container');
+            
+            if (songs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No songs in this playlist</div>';
+                return;
+            }
+            
+            let html = '';
+            songs.forEach((song, index) => {
+                html += `
+                    <div class="song-item" onclick="playSong(${index})">
+                        <div class="song-cover">
+                            ${song.cover_url ? 
+                                `<img src="${song.cover_url}" alt="${song.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">` : 
+                                '🎵'
+                            }
+                        </div>
+                        <div class="song-info">
+                            <div class="song-title">${song.title}</div>
+                            <div class="song-artist">${song.artist || 'Unknown Artist'}</div>
+                        </div>
+                        <div style="color: #666; font-size: 14px;">
+                            Uploaded by: ${song.uploaded_by}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function playSong(index) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            const song = currentPlaylistSongs[index];
+            currentSongIndex = index;
+            
+            // آپدیت پلیر
+            document.getElementById('bottom-player').style.display = 'block';
+            document.getElementById('bottom-player').innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; border-radius: 8px; background: #ff9133; display: flex; align-items: center; justify-content: center;">
+                            ${song.cover_url ? 
+                                `<img src="${song.cover_url}" alt="${song.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">` : 
+                                '🎵'
+                            }
+                        </div>
+                        <div>
+                            <div style="font-weight: bold;">${song.title}</div>
+                            <div style="font-size: 12px;">${song.artist || 'Unknown Artist'}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <button onclick="skipBackward()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">⏮</button>
+                        <button onclick="togglePlay()" id="play-btn" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">▶</button>
+                        <button onclick="skipForward()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">⏭</button>
+                    </div>
+                    <button onclick="closePlayer()" style="background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 14px; cursor: pointer;">✕</button>
+                </div>
+            `;
+            
+            // پخش آهنگ
+            currentAudio = new Audio(song.audio_url);
+            currentAudio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('play-btn').textContent = '⏸';
+            });
+            
+            currentAudio.addEventListener('ended', skipForward);
+        }
+
+        function togglePlay() {
+            if (!currentAudio) return;
+            
+            if (isPlaying) {
+                currentAudio.pause();
+                document.getElementById('play-btn').textContent = '▶';
+            } else {
+                currentAudio.play();
+                document.getElementById('play-btn').textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function skipForward() {
+            if (currentPlaylistSongs.length === 0) return;
+            const nextIndex = (currentSongIndex + 1) % currentPlaylistSongs.length;
+            playSong(nextIndex);
+        }
+
+        function skipBackward() {
+            if (currentPlaylistSongs.length === 0) return;
+            const prevIndex = (currentSongIndex - 1 + currentPlaylistSongs.length) % currentPlaylistSongs.length;
+            playSong(prevIndex);
+        }
+
+        function playAllSongs() {
+            if (currentPlaylistSongs.length > 0) {
+                playSong(0);
+            }
+        }
+
+        function closePlayer() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            document.getElementById('bottom-player').style.display = 'none';
+            isPlaying = false;
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('error-text').textContent = message;
+        }
+    </script>
+</body>
+</html>

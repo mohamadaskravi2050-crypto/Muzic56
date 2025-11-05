@@ -1,0 +1,333 @@
+<!-- global_player.html -->
+<style>
+    /* Global Player Styles */
+    #global-player {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #ff7b00;
+        color: white;
+        padding: 15px 20px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+    .global-player-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+    }
+    .global-player-cover {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, #ff9133, #ff7b00);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .global-player-details {
+        flex: 1;
+        min-width: 0;
+    }
+    .global-player-title {
+        font-weight: bold;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .global-player-artist {
+        font-size: 12px;
+        opacity: 0.9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .global-player-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 2;
+        justify-content: center;
+    }
+    .global-player-controls button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .global-player-controls button:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    .global-progress-bar {
+        flex: 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .global-progress-container {
+        flex: 1;
+        height: 4px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        cursor: pointer;
+        position: relative;
+    }
+    .global-progress {
+        height: 100%;
+        background: white;
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.1s ease;
+    }
+    .global-time {
+        font-size: 12px;
+        min-width: 40px;
+    }
+    .global-close-player {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ff7b00;
+        font-weight: bold;
+    }
+    </style>
+    
+    <!-- Global Music Player -->
+    <div id="global-player">
+        <button class="global-close-player" onclick="closeGlobalPlayer()">✕</button>
+        <div class="global-player-info">
+            <div class="global-player-cover" id="global-player-cover">🎵</div>
+            <div class="global-player-details">
+                <div class="global-player-title" id="global-player-title">No song selected</div>
+                <div class="global-player-artist" id="global-player-artist">Select a song to play</div>
+            </div>
+        </div>
+        <div class="global-player-controls">
+            <button onclick="globalSkipBackward()">⏮</button>
+            <button onclick="globalTogglePlay()" id="global-play-btn">▶</button>
+            <button onclick="globalSkipForward()">⏭</button>
+        </div>
+        <div class="global-progress-bar">
+            <span class="global-time" id="global-current-time">0:00</span>
+            <div class="global-progress-container" onclick="globalSeek(event)">
+                <div class="global-progress" id="global-progress"></div>
+            </div>
+            <span class="global-time" id="global-duration">0:00</span>
+        </div>
+    </div>
+    
+    <script>
+    // ========== Global Player Variables ==========
+    let globalAudio = null;
+    let globalCurrentMusicIndex = -1;
+    let globalMusicList = [];
+    let globalIsPlaying = false;
+    
+    // ========== Global Player Functions ==========
+    function initializeGlobalPlayer() {
+        const savedState = loadGlobalPlaybackState();
+        if (savedState && savedState.currentMusic) {
+            globalMusicList = savedState.musicList || [];
+            globalCurrentMusicIndex = savedState.currentMusicIndex;
+            globalIsPlaying = savedState.isPlaying;
+            
+            updateGlobalPlayerInfo(savedState.currentMusic);
+            document.getElementById('global-player').style.display = 'flex';
+            
+            if (globalIsPlaying) {
+                document.getElementById('global-play-btn').textContent = '⏸';
+            }
+            
+            // اگر در حال پخش بود، audio object رو recreate کن
+            if (globalIsPlaying && savedState.currentTime) {
+                playGlobalMusic(savedState.currentMusic, globalMusicList, savedState.currentTime);
+            }
+        }
+        
+        setInterval(saveGlobalPlaybackState, 1000);
+    }
+    
+    function saveGlobalPlaybackState() {
+        const playbackState = {
+            currentMusicIndex: globalCurrentMusicIndex,
+            isPlaying: globalIsPlaying,
+            musicList: globalMusicList,
+            currentMusic: globalMusicList[globalCurrentMusicIndex],
+            currentTime: globalAudio ? globalAudio.currentTime : 0,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('globalPlaybackState', JSON.stringify(playbackState));
+    }
+    
+    function loadGlobalPlaybackState() {
+        try {
+            const savedState = localStorage.getItem('globalPlaybackState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                if (Date.now() - state.timestamp < 14400000) { // 4 hours
+                    return state;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading global playback state:', error);
+        }
+        return null;
+    }
+    
+    function playGlobalMusic(musicData, musicList = null, seekTime = 0) {
+        if (musicList) {
+            globalMusicList = musicList;
+        }
+        
+        const musicIndex = globalMusicList.findIndex(music => music.id === musicData.id);
+        if (musicIndex === -1) return;
+        
+        if (globalAudio) {
+            globalAudio.pause();
+            globalAudio = null;
+        }
+    
+        globalCurrentMusicIndex = musicIndex;
+        const music = globalMusicList[musicIndex];
+        
+        updateGlobalPlayerInfo(music);
+        
+        globalAudio = new Audio(music.audio_url);
+        
+        globalAudio.addEventListener('loadedmetadata', function() {
+            document.getElementById('global-duration').textContent = formatGlobalTime(globalAudio.duration);
+            
+            if (seekTime > 0) {
+                globalAudio.currentTime = seekTime;
+            }
+            
+            globalAudio.play().then(() => {
+                globalIsPlaying = true;
+                document.getElementById('global-play-btn').textContent = '⏸';
+                saveGlobalPlaybackState();
+            }).catch(error => {
+                console.error('Play failed:', error);
+            });
+        });
+        
+        globalAudio.addEventListener('timeupdate', function() {
+            if (globalAudio.duration) {
+                const progress = (globalAudio.currentTime / globalAudio.duration) * 100;
+                document.getElementById('global-progress').style.width = progress + '%';
+                document.getElementById('global-current-time').textContent = formatGlobalTime(globalAudio.currentTime);
+            }
+        });
+        
+        globalAudio.addEventListener('ended', function() {
+            globalIsPlaying = false;
+            document.getElementById('global-play-btn').textContent = '▶';
+            globalSkipForward();
+        });
+        
+        globalAudio.addEventListener('error', function(e) {
+            console.error('Audio error:', e);
+        });
+        
+        document.getElementById('global-player').style.display = 'flex';
+    }
+    
+    function updateGlobalPlayerInfo(music) {
+        document.getElementById('global-player-title').textContent = music.title;
+        document.getElementById('global-player-artist').textContent = music.artist || 'Unknown Artist';
+        
+        if (music.cover_url) {
+            document.getElementById('global-player-cover').innerHTML = `<img src="${music.cover_url}" alt="${music.title}" style="width:100%;height:100%;border-radius:8px;object-fit:cover;">`;
+        } else {
+            document.getElementById('global-player-cover').innerHTML = '🎵';
+        }
+    }
+    
+    function globalTogglePlay() {
+        if (!globalAudio) {
+            const savedState = loadGlobalPlaybackState();
+            if (savedState && savedState.currentMusic) {
+                playGlobalMusic(savedState.currentMusic, savedState.musicList, savedState.currentTime);
+            }
+            return;
+        }
+        
+        if (globalIsPlaying) {
+            globalAudio.pause();
+            document.getElementById('global-play-btn').textContent = '▶';
+        } else {
+            globalAudio.play().then(() => {
+                document.getElementById('global-play-btn').textContent = '⏸';
+            }).catch(error => {
+                console.error('Play failed:', error);
+            });
+        }
+        globalIsPlaying = !globalIsPlaying;
+        saveGlobalPlaybackState();
+    }
+    
+    function globalSkipForward() {
+        if (globalMusicList.length === 0) return;
+        const nextIndex = (globalCurrentMusicIndex + 1) % globalMusicList.length;
+        playGlobalMusic(globalMusicList[nextIndex]);
+    }
+    
+    function globalSkipBackward() {
+        if (globalMusicList.length === 0) return;
+        const prevIndex = (globalCurrentMusicIndex - 1 + globalMusicList.length) % globalMusicList.length;
+        playGlobalMusic(globalMusicList[prevIndex]);
+    }
+    
+    function globalSeek(event) {
+        if (!globalAudio) return;
+        const progressContainer = event.currentTarget;
+        const clickX = event.offsetX;
+        const width = progressContainer.offsetWidth;
+        const duration = globalAudio.duration;
+        globalAudio.currentTime = (clickX / width) * duration;
+    }
+    
+    function closeGlobalPlayer() {
+        if (globalAudio) {
+            globalAudio.pause();
+            globalAudio = null;
+        }
+        document.getElementById('global-player').style.display = 'none';
+        globalIsPlaying = false;
+        localStorage.removeItem('globalPlaybackState');
+    }
+    
+    function formatGlobalTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+    
+    // Initialize global player when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeGlobalPlayer();
+    });
+    </script>

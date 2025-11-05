@@ -1,0 +1,27 @@
+<h2>Register</h2>
+<input type="text" id="username" placeholder="Username"><br>
+<input type="password" id="password" placeholder="Password"><br>
+<button onclick="register()">Register</button>
+<p id="msg"></p>
+
+<script>
+function register() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch("/api/register/", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username,password})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.error) {
+            document.getElementById('msg').innerText = data.error;
+        } else {
+            localStorage.setItem('access', data.access);
+            window.location.href = "/";
+        }
+    });
+}
+</script>
