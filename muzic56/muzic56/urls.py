@@ -17,11 +17,14 @@ urlpatterns = [
     path('my-playlists/', TemplateView.as_view(template_name="core/my_playlists.html"), name="my_playlists"),
     path('create-playlist/', TemplateView.as_view(template_name="core/create_playlist.html"), name="create_playlist"),
     path('playlist-detail/', TemplateView.as_view(template_name="core/playlist_detail.html"), name="playlist_detail"),
-    path('search/', TemplateView.as_view(template_name="core/search.html"), name='search'),  # این خط را اصلاح کنید
-     path('public-playlists-search/', TemplateView.as_view(template_name='public_playlists_search.html'), name='public-playlists-search'),
+    path('search/', TemplateView.as_view(template_name="core/search.html"), name='search'),
+    
+    # اصلاح شده: اضافه کردن core/ به مسیر template
+    path('public-playlists-search/', TemplateView.as_view(template_name='core/public_playlists_search.html'), name='public-playlists-search'),
+    path('public-playlist-detail/', TemplateView.as_view(template_name='core/public_playlist_detail.html'), name='public-playlist-detail'),
+    
     # API endpoints
     path('api/', include('core.urls')),
-    path('public-playlist-detail/', TemplateView.as_view(template_name='public_playlist_detail.html'), name='public-playlist-detail'),
 ]
 
 if settings.DEBUG:

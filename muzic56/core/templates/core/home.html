@@ -700,7 +700,7 @@ main {
     font-size: 14px;
 }
 
-/* استایل input جستجو در هدر */
+
 #header-search {
     width: 100%;
     padding: 10px 15px;
@@ -720,12 +720,12 @@ main {
 </head>
 <body>
 
-<!-- در تگ <header>، بعد از دکمه‌ها و قبل از profile-circle این کد را اضافه کنید: -->
+
 
     <header>
         <div class="logo">Muzic56</div>
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; max-width: 400px; margin: 0 20px; justify-content: center;">
-            <!-- مسیر صحیح: /search (بدون .html) -->
+            
             <button id="search-btn" class="btn" onclick="window.location.href='/search/'">🔍 Search Muzic </button>
         </div>
        
@@ -742,7 +742,7 @@ main {
     <h1 style="text-align:center; margin-bottom:10px;">Welcome to Muzic56 🎵</h1>
     <p style="text-align:center; margin-bottom:30px; color:#666;">Upload, listen, and enjoy music freely.</p>
 
-    <!-- Upload Section -->
+    
     <div id="upload-section" class="upload-section hidden">
         <h2>Upload Your Music</h2>
         <input type="text" id="music-title" placeholder="Music Title *"><br>
@@ -760,39 +760,34 @@ main {
         <div class="music-carousel">
             <button class="carousel-btn carousel-prev" onclick="prevSlide()">❮</button>
             <div class="carousel-container" id="carousel-container">
-                <!-- موزیک‌ها اینجا نمایش داده می‌شوند -->
+                
             </div>
             <button class="carousel-btn carousel-next" onclick="nextSlide()">❯</button>
         </div>
     </div>
 
 
-    <!-- بعد از بخش Music Carousel و قبل از Public Playlists این کد را اضافه کنید -->
 
-<!-- موتور جستجو -->
-
-<!-- موزیک‌های پرطرفدار -->
-<!-- موزیک‌های پرطرفدار -->
 <div id="popular-music-section" style="margin: 50px 0;">
     <h2 style="text-align: center; margin-bottom: 30px;">🔥 پرطرفدارترین موزیک‌ها</h2>
     
     <div class="music-carousel">
         <button class="carousel-btn carousel-prev" onclick="prevPopularSlide()">❮</button>
         <div class="carousel-container" id="popular-carousel-container">
-            <!-- موزیک‌های پرطرفدار اینجا لود می‌شوند -->
+            
         </div>
         <button class="carousel-btn carousel-next" onclick="nextPopularSlide()">❯</button>
     </div>
     
     <div id="popular-music" class="music-grid" style="display: none;">
-        <!-- فول backup -->
+        
     </div>
 </div>
 
-    <!-- Public Playlists Section -->
+    
 
 
-    <!-- About Us Section -->
+    
     <div id="about-section" class="about-section">
         <h2>About me</h2>
         <div class="about-content">
@@ -903,7 +898,7 @@ main {
 </footer>
 
 <script>
-// ========== متغیرهای گلوبال ==========
+
 let currentAudio = null;
 let currentMusicIndex = -1;
 let musicList = [];
@@ -917,7 +912,7 @@ let likedMusicList = [];
 let currentListType = 'main'; // 'main', 'liked', 'popular'
 let currentMusicList = [];
 
-// ========== المنت های DOM ==========
+
 const authBtn = document.getElementById('auth-btn');
 const uploadBtn = document.getElementById('upload-btn');
 const playlistsBtn = document.getElementById('playlists-btn');
@@ -932,7 +927,7 @@ const modalUsername = document.getElementById('modal-username');
 const modalPassword = document.getElementById('modal-password');
 const bottomPlayer = document.getElementById('bottom-player');
 
-// ========== Event Listeners ==========
+
 authBtn.addEventListener('click', () => modal.classList.remove('hidden'));
 uploadBtn.addEventListener('click', handleUploadClick);
 playlistsBtn.addEventListener('click', handlePlaylistsClick);
@@ -947,7 +942,7 @@ modalPassword.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleAuthSubmit();
 });
 
-// کلیک روی پلیر پایین برای باز کردن پلیر توسعه یافته
+
 bottomPlayer.addEventListener('click', function(event) {
     if (event.target === bottomPlayer || 
         event.target.classList.contains('player-info') ||
@@ -959,7 +954,7 @@ bottomPlayer.addEventListener('click', function(event) {
     }
 });
 
-// ========== سیستم ذخیره و بازیابی وضعیت پخش ==========
+
 
 function savePlaybackState() {
     if (currentAudio && musicList[currentMusicIndex]) {
@@ -1727,12 +1722,12 @@ function checkLogin() {
     }
 }
 
-// هنگام بسته شدن صفحه، وضعیت را ذخیره کن
+
 window.addEventListener('beforeunload', function() {
     savePlaybackState();
 });
 
-// هنگام بازگشت به صفحه، وضعیت را چک کن
+
 window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
         setTimeout(() => {
@@ -2152,7 +2147,7 @@ function playFromHeaderSearch(musicId) {
     });
 }
 
-// ========== موزیک‌های پرطرفدار ==========
+
 
 function loadPopularMusic() {
     console.log('🔥 Loading popular music...');
@@ -2233,7 +2228,7 @@ function showPopularMusicFallback() {
     }
 }
 
-// ========== تابع پخش موزیک ==========
+
 
 function playMusicDirect(musicData) {
     // اگر musicData رشته JSON باشد، تبدیل به object کن
@@ -2284,7 +2279,7 @@ function playMusicDirect(musicData) {
     document.getElementById('bottom-player').style.display = 'flex';
 }
 
-// تابع formatTime اگر وجود ندارد اضافه کنید
+
 function formatTime(seconds) {
     if (isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
@@ -2292,7 +2287,7 @@ function formatTime(seconds) {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// ========== موزیک‌های پرطرفدار ==========
+
 
 function loadPopularMusic() {
     console.log('🔥 درحال بارگذاری موزیک‌های پرطرفدار...');
@@ -2382,7 +2377,7 @@ function showPopularMusicFallback(errorMessage) {
     }
 }
 
-// تابع playMusicDirect که قبلاً داشتیم - مطمئن شویم کار می‌کند
+
 function playMusicDirect(musicData) {
     if (typeof musicData === 'string') {
         try {
@@ -2461,7 +2456,6 @@ function checkLogin() {
 
 
 
-// ========== کاروسل موزیک‌های پرطرفدار ==========
 let popularCurrentSlide = 0;
 let popularMusicList = [];
 

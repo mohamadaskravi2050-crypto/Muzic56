@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from .models import Music, Playlist, PlaylistSong
-from django.db.models import Count  # این خط را اضافه کنید
+from django.db.models import Count  
 
 class MusicSerializer(serializers.ModelSerializer):
     audio_url = serializers.SerializerMethodField()
     cover_url = serializers.SerializerMethodField()
     uploaded_by_username = serializers.CharField(source='uploaded_by.username', read_only=True)
-    like_count = serializers.SerializerMethodField()  # این خط مشکل دارد
+    like_count = serializers.SerializerMethodField()  
     is_liked = serializers.SerializerMethodField()
 
     class Meta:
@@ -27,7 +27,7 @@ class MusicSerializer(serializers.ModelSerializer):
         return None
 
     def get_like_count(self, obj):
-        # این متد را اصلاح می‌کنیم
+        
         if hasattr(obj, 'likes_count'):
             return obj.likes_count
         return obj.likes.count()
@@ -71,4 +71,6 @@ class PlaylistDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'songs', 'created_at', 'owner_username', 'is_public', 'song_count']
 
     def get_song_count(self, obj):
+
+     
         return obj.songs.count()
